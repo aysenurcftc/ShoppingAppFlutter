@@ -18,6 +18,8 @@ class CategoriesScreen extends StatelessWidget {
           child: AppBar(
             backgroundColor: Colors.grey.shade50,
           bottom: TabBar(
+            indicatorColor: Colors.pinkAccent,
+            labelColor: Colors.pinkAccent,
             tabs: [
               Tab(text: "Kadın",),
               Tab(text: "Erkek",),

@@ -13,10 +13,13 @@ class AddProductScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.grey.shade50,
         title: Center(
-          child: Container(
-            color: Colors.grey.shade50,
-            child: Text("Ürün Bilgisi",
+          child: Text("Ürün Bilgisi",
+            style: TextStyle(
+              color: Colors.grey.shade600,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -30,7 +33,6 @@ class AddProductScreen extends StatelessWidget {
               child: Text("Fotoğraflar",
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
                   color: Colors.grey.shade600,
                 ),
               ),
@@ -38,13 +40,12 @@ class AddProductScreen extends StatelessWidget {
 
             Container(
               width: width ,
-              height: 200,
               color: Colors.white,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 26,bottom: 15,top: 15),
+                    padding: const EdgeInsets.only(left: 26,bottom: 15,top: 15,),
                     child: Text("En az 3 tane resim yükleyin",
                       style: TextStyle(
                         fontSize: 14,
@@ -53,13 +54,12 @@ class AddProductScreen extends StatelessWidget {
                   ),
 
                   Row(
-
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 20,right: 20),
+                        padding: const EdgeInsets.only(left: 20,right: 20,bottom: 20),
                         child: Container(
-                            width: 130,
-                            height: 130,
+                            width: 150,
+                            height: 55,
                             decoration: BoxDecoration(
                               color: Colors.white, // Container rengi
                               borderRadius: BorderRadius.circular(20), // Köşeleri yuvarlaklaştırma
@@ -83,8 +83,7 @@ class AddProductScreen extends StatelessWidget {
               padding: const EdgeInsets.only(left: 26,top: 10,bottom: 10),
               child: Text("Ürün Başlığı",
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
                   color: Colors.grey.shade600,
                 ),
               ),
@@ -100,6 +99,10 @@ class AddProductScreen extends StatelessWidget {
                   maxLength: 5,
                   decoration: InputDecoration(
                     hintText: "En az 5 karakterli ürün başlığı",
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade600,
+                    ),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -111,8 +114,7 @@ class AddProductScreen extends StatelessWidget {
               padding: const EdgeInsets.only(left: 26,top: 10,bottom: 10),
               child: Text("Ürün Açıklaması",
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
                   color: Colors.grey.shade600,
                 ),
               ),
@@ -124,17 +126,101 @@ class AddProductScreen extends StatelessWidget {
               color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.only(left: 20,right: 20),
-                child: TextField(
-                  maxLength: 50,
-                  keyboardType: TextInputType.multiline,
-                  decoration: InputDecoration(
-                    hintText: "En az 5 karakterli ürün başlığı",
-                    border: OutlineInputBorder(),
+                child: SizedBox(
+                  height: 200,
+                  child: TextField(
+                    minLines: 1,
+                    maxLines: 10,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      hintText: "Ürün açıklaması",
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
               ),
             ),
 
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Container(
+                color: Colors.white,
+                width: width,
+                child: ListTile(
+                  title: Row(
+                    children: [
+                      Text("Kategorisi",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                        ),),
+                      Spacer(),
+                      Icon(Icons.arrow_forward_ios,
+                        color: Colors.grey.shade600,),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.only(top: 5, bottom: 5),
+              child: Container(
+                color: Colors.white,
+                width: width,
+                child: ListTile(
+                  title: Row(
+                    children: [
+                      Text("Durumu",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                        ),),
+                      Spacer(),
+                      Icon(Icons.arrow_forward_ios,
+                        color: Colors.grey.shade600,),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Container(
+                color: Colors.white,
+                width: width,
+                child: ListTile(
+                  title: Row(
+                    children: [
+                      Text("Fiyatı",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                        ),),
+                      Spacer(),
+                      Icon(Icons.arrow_forward_ios,
+                        color: Colors.grey.shade600,),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+
+            Padding(
+              padding: const EdgeInsets.only(bottom: 25),
+              child: Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: Colors.pinkAccent, // foreground
+                  ),
+                  onPressed: () { },
+                  child: Text('Tamamla'),
+                ),
+              ),
+            )
 
           ],
         ),

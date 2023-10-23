@@ -50,8 +50,16 @@ class ProfileScreen extends StatelessWidget {
                   ),
 
                   Spacer(),
+                  Text("Sayfama git",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                    color: Colors.grey.shade600,
+
+                  ),),
                   Padding(
-                    padding: const EdgeInsets.only(right: 10),
+                    padding: const EdgeInsets.only(left:10,right: 10),
                     child: Icon(Icons.arrow_forward_ios,
                       color: Colors.grey.shade600,
                     ),
