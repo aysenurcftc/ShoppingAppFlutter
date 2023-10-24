@@ -13,6 +13,7 @@ class AddProductScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.grey.shade50,
         title: Center(
           child: Text("Ürün Bilgisi",

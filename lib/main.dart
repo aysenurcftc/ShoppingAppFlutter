@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:senior_project/ui/bottomnav-screen.dart';
-import 'package:senior_project/ui/home-screen.dart';
+import 'package:senior_project/ui/login/login-screen.dart';
+import 'package:senior_project/ui/login/register-screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
           scaffoldBackgroundColor: Colors.grey.shade50,
       ),
-      home: Home()
+      home: LoginScreen()
     );
   }
 }

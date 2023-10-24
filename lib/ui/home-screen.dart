@@ -92,16 +92,15 @@ class HomeScreen extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 15,
-                  ),),
+                  ),
+                ),
               ],
             ),
           ),
-
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
@@ -126,7 +125,7 @@ class HomeScreen extends StatelessWidget {
                           width: 150,),
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
-                          child: Text("Mevsimin Favorilerini Keşfet",
+                          child: Text("Kupon Fırsatları",
                             textAlign: TextAlign.center,
                             style: TextStyle(
 
@@ -136,7 +135,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
@@ -157,11 +155,11 @@ class HomeScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        Image.asset("img/home-tshirt.jpg",
+                        Image.asset("img/home-2.jpg",
                           width: 150,),
                         Padding(
                           padding: const EdgeInsets.only(top: 15),
-                          child: Text("200 TL Altı T-shirtler",
+                          child: Text("En Beğenilenler",
                             textAlign: TextAlign.center,),
                         ),
                       ],
@@ -200,7 +198,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
 
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -275,7 +272,7 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.only(right: 10, left: 10, top: 10),
             child: Row(
               children: [
-                Text("En Beğenilenler",
+                Text("En Yeniler",
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontWeight: FontWeight.bold,
@@ -286,14 +283,13 @@ class HomeScreen extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 15,
-                  ),),
+                  ),
+                ),
               ],
             ),
           ),
-
         ],
       ),
-
     );
   }
 }

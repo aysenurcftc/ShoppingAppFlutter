@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:senior_project/ui/child-categories.dart';
-import 'package:senior_project/ui/man_categories.dart';
-import 'package:senior_project/ui/women_categories.dart';
-
+import 'package:senior_project/ui/categories/child-categories.dart';
+import 'package:senior_project/ui/categories/man_categories.dart';
+import 'package:senior_project/ui/categories/women_categories.dart';
 
 
 class CategoriesScreen extends StatelessWidget {
@@ -16,8 +15,9 @@ class CategoriesScreen extends StatelessWidget {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(50),
           child: AppBar(
+            automaticallyImplyLeading: false,
             backgroundColor: Colors.grey.shade50,
-          bottom: TabBar(
+          bottom: const TabBar(
             indicatorColor: Colors.pinkAccent,
             labelColor: Colors.pinkAccent,
             tabs: [
