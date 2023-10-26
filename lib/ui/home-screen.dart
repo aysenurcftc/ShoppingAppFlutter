@@ -56,7 +56,7 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(top: 12, bottom: 20),
-                          child: Text("ShiningApp'de Al, Sat, Keşfet",
+                          child: Text("Al, Sat, Keşfet",
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 20,

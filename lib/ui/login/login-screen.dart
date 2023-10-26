@@ -1,6 +1,8 @@
 
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/ui/bottomnav-screen.dart';
 import 'package:senior_project/ui/login/forgotpass-screen.dart';
 import 'package:senior_project/ui/login/register-screen.dart';
@@ -18,7 +20,41 @@ class _LoginScreenState extends State<LoginScreen> {
   var passwordController = TextEditingController();
 
 
+
   var obscureText = true;
+
+
+  AuthService authservice = AuthService();
+
+
+  Future<void> signInWithEmailAndPassword() async {
+    try {
+      authservice.signIn(
+          context,
+          email: emailController.text,
+          password: passwordController.text
+      );
+    } on FirebaseAuthException catch(e){
+      showDialog(context: context, builder: (context){
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20), // Kenar yarıçapını ayarlayın
+          ),
+          content: Text(e.message.toString()),
+        );
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+
+  }
+
+
 
 
   @override
@@ -114,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                               onPressed: (){
-
+                                signInWithEmailAndPassword();
                               },
                               child: Text("Giriş Yap")
                           ),
@@ -174,9 +210,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 ),
                               ),
-
-
-
 
                             ],
                           ),

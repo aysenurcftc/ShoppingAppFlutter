@@ -14,6 +14,34 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
   var emailController = TextEditingController();
 
 
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  Future passwordReset() async {
+    try {
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: emailController.text.trim());
+      showDialog(context: context, builder: (context){
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20), // Kenar yarıçapını ayarlayın
+          ),
+          content: Text("Password reset link sent! Check your email"),
+        );
+      });
+
+    } on FirebaseAuthException catch (e) {
+      print(e);
+      showDialog(context: context, builder: (context){
+        return AlertDialog(
+          content: Text(e.message.toString()),
+        );
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +66,9 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                         style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
-                        ),),
+                        ),
+                      ),
                     ),
-
-
 
 
                     Padding(

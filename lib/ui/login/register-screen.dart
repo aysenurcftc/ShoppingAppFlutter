@@ -1,6 +1,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/ui/login/login-screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -20,6 +21,88 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
 
   var obscureText = true;
+
+  AuthService authservice = AuthService();
+
+
+  Future<void> registerWithEmailAndPassword() async {
+
+    if (userNameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        passwordAgainController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Row(
+              children: [
+                Icon(Icons.cancel, color: Colors.red),
+                Text("Please fill in all fields",
+                  style: TextStyle(
+                      fontSize: 15
+                  ),),
+              ],
+            ),
+          );
+        },
+      );
+      return;
+    }
+
+    if (passwordController.text != passwordAgainController.text) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20), // Kenar yarıçapını ayarlayın
+            ),
+            title: Row(
+              children: [
+                Icon(Icons.cancel, color: Colors.red),
+                SizedBox(width: 20),
+                Text("Passwords do not match",
+                  style: TextStyle(
+                      fontSize: 15
+                  ),),
+              ],
+            ),
+          );
+        },
+      );
+      return;
+    }
+    try {
+      authservice.signUp(
+        context,
+        userName: userNameController.text,
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+
+
+    } on FirebaseAuthException catch(e){
+      showDialog(context: context, builder: (context){
+        return AlertDialog(
+          content: Text(e.message.toString()),
+        );
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    userNameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    passwordAgainController.dispose();
+  }
 
 
 
@@ -148,7 +231,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                               onPressed: (){
-
+                                registerWithEmailAndPassword();
                               },
                               child: Text("Üye Ol")
                           ),
