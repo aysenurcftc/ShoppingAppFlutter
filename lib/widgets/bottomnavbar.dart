@@ -9,6 +9,8 @@ class BottomNavigationBarWidget extends StatelessWidget {
     required this.onTap,
   });
 
+
+
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
@@ -16,6 +18,7 @@ class BottomNavigationBarWidget extends StatelessWidget {
       onTap: onTap,
       showSelectedLabels: true,
       showUnselectedLabels: true,
+
       items: [
         BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined,
