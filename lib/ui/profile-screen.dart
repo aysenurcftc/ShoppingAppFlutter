@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senior_project/service/auth.dart';
 
 class ProfileScreen extends StatelessWidget {
 
@@ -7,6 +8,8 @@ class ProfileScreen extends StatelessWidget {
   void _startSearch() {
     String query = _searchController.text;
   }
+
+  AuthService authservice = AuthService();
 
 
   @override
@@ -192,18 +195,23 @@ class ProfileScreen extends StatelessWidget {
             Container(
               color: Colors.white,
               width: width,
-              child: ListTile(
-                leading: Icon(Icons.arrow_back_outlined),
-                title: Row(
-                  children: [
-                    Text("Çıkış Yap",
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                      ),),
-                    Spacer(),
-                    Icon(Icons.arrow_forward_ios,
-                      color: Colors.grey.shade600,),
-                  ],
+              child: GestureDetector(
+                onTap: (){
+                  authservice.signOut(context);
+                },
+                child: ListTile(
+                  leading: Icon(Icons.arrow_back_outlined),
+                  title: Row(
+                    children: [
+                      Text("Çıkış Yap",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                        ),),
+                      Spacer(),
+                      Icon(Icons.arrow_forward_ios,
+                        color: Colors.grey.shade600,),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 class AddProductScreen extends StatelessWidget {
   const AddProductScreen({Key? key}) : super(key: key);
 
@@ -9,6 +10,8 @@ class AddProductScreen extends StatelessWidget {
     var screenSize = MediaQuery.of(context);
     final double height = screenSize.size.height;
     final double width = screenSize.size.width;
+
+
 
 
     return Scaffold(
@@ -196,10 +199,17 @@ class AddProductScreen extends StatelessWidget {
                 child: ListTile(
                   title: Row(
                     children: [
-                      Text("Fiyatı",
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),),
+                      SizedBox(
+                        height: 200,
+                        child: TextField(
+                          maxLines: 1,
+                          decoration: InputDecoration(
+                           hintText: "Fiyatı"
+                          ),
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),),
+                      ),
                       Spacer(),
                       Icon(Icons.arrow_forward_ios,
                         color: Colors.grey.shade600,),

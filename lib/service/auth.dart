@@ -1,7 +1,9 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:senior_project/ui/bottomnav-screen.dart';
 import 'package:senior_project/ui/login/login-screen.dart';
 
@@ -11,12 +13,14 @@ class AuthService{
   final userCollection = FirebaseFirestore.instance.collection("users");
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-  Future<void> signUp(BuildContext context, {required String userName, required String email, required String password}) async {
+  Future<void> signUp(BuildContext context, {required String name, required String surname,
+    required String userName, required String email,required String phoneNumber, required String password}) async {
 
     final navigator = Navigator.of(context);
 
     try {
-      final UserCredential userCredential = await auth.createUserWithEmailAndPassword(email: email, password: password);
+      final UserCredential userCredential = await auth.createUserWithEmailAndPassword(email: email,
+          password: password);
 
       if (userCredential.user != null) {
         final currentUser = auth.currentUser;
@@ -27,6 +31,9 @@ class AuthService{
           await userCollection.doc(user.uid).set({
             'userName': userName,
             'email': email,
+            'name' : name,
+            'surname': surname,
+            'phone' : phoneNumber
           });
         }
 
@@ -63,6 +70,22 @@ class AuthService{
     }
 
   }
+
+  Future<UserCredential> signInWithGoogle() async {
+
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
 
 
 

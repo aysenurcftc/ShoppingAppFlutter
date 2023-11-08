@@ -13,12 +13,12 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
 
+  var nameController = TextEditingController();
+  var surnameController = TextEditingController();
   var userNameController = TextEditingController();
+  var phoneController = TextEditingController();
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
-  var passwordAgainController = TextEditingController();
-
-
 
   var obscureText = true;
 
@@ -30,7 +30,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (userNameController.text.isEmpty ||
         emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
-        passwordAgainController.text.isEmpty) {
+        nameController.text.isEmpty ||
+        surnameController.text.isEmpty ||
+        phoneController.text.isEmpty ) {
       showDialog(
         context: context,
         builder: (context) {
@@ -53,33 +55,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    if (passwordController.text != passwordAgainController.text) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // Kenar yarıçapını ayarlayın
-            ),
-            title: Row(
-              children: [
-                Icon(Icons.cancel, color: Colors.red),
-                SizedBox(width: 20),
-                Text("Passwords do not match",
-                  style: TextStyle(
-                      fontSize: 15
-                  ),),
-              ],
-            ),
-          );
-        },
-      );
-      return;
-    }
     try {
       authservice.signUp(
         context,
+        name: nameController.text,
+        surname: surnameController.text,
         userName: userNameController.text,
+        phoneNumber: phoneController.text,
         email: emailController.text,
         password: passwordController.text,
       );
@@ -101,7 +83,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     userNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
-    passwordAgainController.dispose();
+    phoneController.dispose();
+    nameController.dispose();
+    surnameController.dispose();
   }
 
 
@@ -123,7 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                   children: [
                     const Padding(
-                      padding: EdgeInsets.only(top: 74,bottom: 20),
+                      padding: EdgeInsets.only(top: 60,bottom: 10),
                       child: Text("Üye Ol",
                         style: TextStyle(
                           color: Colors.black,
@@ -135,16 +119,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Container(
                       child: Padding(
                         padding: EdgeInsets.only(
-                            top: MediaQuery.of(context).size.height * 0.1,
-                            right: 35,
-                            left: 35
+                            top: MediaQuery.of(context).size.height * 0.05,
+                            right: 20,
+                            left: 20,
                         ),
                         child: Column(
                           children: [
+
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: nameController,
+                                    decoration: InputDecoration(
+                                        suffixIcon: Icon(Icons.person_outline),
+                                        fillColor: Colors.transparent,
+                                        filled: true,
+                                        hintText: "Ad",
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+
+                                        )
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: TextField(
+                                    controller: surnameController,
+                                    decoration: InputDecoration(
+                                        suffixIcon: Icon(Icons.person_outline_outlined),
+                                        fillColor: Colors.transparent,
+                                        filled: true,
+                                        hintText: "Soyad",
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+
+                                        )
+                                    ),
+                                  ),
+                                ),
+
+                              ],
+                            ),
+                            const SizedBox(height: 10,),
                             TextField(
                               controller: userNameController,
                               decoration: InputDecoration(
-                                  suffixIcon: Icon(Icons.person),
+                                  suffixIcon: Icon(Icons.person_outline),
                                   fillColor: Colors.transparent,
                                   filled: true,
                                   hintText: "Kullanıcı Adı",
@@ -154,7 +176,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   )
                               ),
                             ),
-                            const SizedBox(height: 20,),
+
+                            const SizedBox(height: 10,),
                             TextField(
                               controller: emailController,
                               decoration: InputDecoration(
@@ -168,7 +191,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   )
                               ),
                             ),
-                            const SizedBox(height: 20,),
+                            const SizedBox(height: 10,),
+
+                            TextField(
+                              controller: phoneController,
+                              decoration: InputDecoration(
+                                  suffixIcon: Icon(Icons.phone),
+                                  fillColor: Colors.transparent,
+                                  filled: true,
+                                  hintText: "Telefon",
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+
+                                  )
+                              ),
+                            ),
+                            const SizedBox(height: 10,),
                             TextField(
                               controller: passwordController,
                               obscureText: obscureText,
@@ -189,27 +227,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   )
                               ),
                             ),
-                            const SizedBox(height: 20,),
-                            TextField(
-                              controller: passwordAgainController,
-                              obscureText: obscureText,
-                              decoration: InputDecoration(
-                                  suffixIcon:  GestureDetector(
-                                    child: obscureText ? Icon(Icons.key_off) : Icon(Icons.key),
-                                    onTap: (){
-                                      setState(() {
-                                        obscureText = !obscureText;
-                                      });
-                                    },
-                                  ),
-                                  fillColor: Colors.transparent,
-                                  filled: true,
-                                  hintText: "Şifre",
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  )
-                              ),
-                            ),
+                            const SizedBox(height: 10,),
+
                           ],
                         ),
                       ),
@@ -222,7 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all<Color>(Colors.pinkAccent.shade100),
                                 fixedSize: MaterialStateProperty.all<Size>(
-                                  const Size(200, 50),
+                                  const Size(300, 50),
                                 ),
                                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
@@ -262,8 +281,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
                                 ],
                               ),
+
                             ],
                           ),
+
+                          SizedBox(height: 20,),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey), borderRadius: BorderRadius.circular(100)
+                                ),
+                                child: IconButton(
+                                  onPressed: (){
+                                    authservice.signInWithGoogle();
+                                  },
+                                  icon: Image(
+                                    width: 30,
+                                    height: 30,
+                                    image: AssetImage("img/logos/google-icon.png"),
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
                         ],
                       ),
                     )

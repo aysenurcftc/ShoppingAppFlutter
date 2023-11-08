@@ -46,6 +46,19 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> signInWithGoogle() async {
+    try {
+      await authservice.signInWithGoogle();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Home()),
+      );
+    } catch (e) {
+      print(e);
+
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -53,9 +66,6 @@ class _LoginScreenState extends State<LoginScreen> {
     passwordController.dispose();
 
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -91,8 +101,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Padding(
                         padding: EdgeInsets.only(
                             top: MediaQuery.of(context).size.height * 0.1,
-                            right: 35,
-                            left: 35
+                            right: 20,
+                            left: 20
                         ),
                         child: Column(
                           children: [
@@ -133,7 +143,31 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 60,),
+                    const SizedBox(height: 12,),
+
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Row(
+                          children: [
+                            Checkbox(value: true, onChanged: (value) {}),
+                            Text("Beni Hatırla"),
+                          ],
+                        ),
+                        TextButton(onPressed: (){
+                          Navigator.push(context,MaterialPageRoute(builder: (context) => ForgotPassScreen()));
+                        }, child: Text("Şifremi unuttum",style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.black,
+                          decoration: TextDecoration.underline,
+                        ),
+                        ),
+                        ),
+                      ],
+                    ),
+
+
                     Center(
                       child: Column(
                         children: [
@@ -141,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all<Color>(Colors.pinkAccent.shade100),
                                 fixedSize: MaterialStateProperty.all<Size>(
-                                  Size(200, 50),
+                                  Size(300, 50),
                                 ),
                                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
@@ -152,7 +186,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: (){
                                 signInWithEmailAndPassword();
                               },
-                              child: Text("Giriş Yap")
+                              child: const Text("Giriş Yap",
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
+                              ),
                           ),
                           SizedBox(height: 20,),
 
@@ -199,16 +237,25 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               SizedBox(height: 20,),
 
-                              GestureDetector(
-                                onTap: (){
-                                  Navigator.push(context,MaterialPageRoute(builder: (context) => ForgotPassScreen()));
-                                },
-                                child: const Text("Şifremi Unuttum?",style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.black,
-                                  decoration: TextDecoration.underline,
-                                ),
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey), borderRadius: BorderRadius.circular(100)
+                                      ),
+                                      child: IconButton(
+                                        onPressed: (){
+                                          signInWithGoogle();
+                                        },
+                                        icon: Image(
+                                          width: 30,
+                                          height: 30,
+                                          image: AssetImage("img/logos/google-icon.png"),
+                                        ),
+                                      ),
+                                    )
+                                ],
                               ),
 
                             ],

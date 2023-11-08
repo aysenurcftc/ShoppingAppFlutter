@@ -61,7 +61,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                   children: [
 
                     Padding(
-                      padding: const EdgeInsets.only(top: 200,bottom: 10),
+                      padding: const EdgeInsets.only(top: 200,bottom: 60),
                       child: const Text("Şifremi Unuttum",
                         style: TextStyle(
                           fontSize: 25,
@@ -72,7 +72,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
 
 
                     Padding(
-                      padding: const EdgeInsets.only(left: 20,right: 20,bottom: 30),
+                      padding: const EdgeInsets.only(left: 20,right: 20,bottom: 20),
                       child: TextField(
                         controller: emailController,
                         decoration: InputDecoration(
@@ -91,7 +91,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(Colors.pinkAccent.shade100),
                         fixedSize: MaterialStateProperty.all<Size>(
-                          Size(200, 50),
+                          Size(300, 50),
                         ),
                         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
@@ -102,7 +102,10 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                       onPressed: (){
 
                       },
-                      child: const Text("Şifremi Sıfırla"),
+                      child: const Text("Şifremi Sıfırla",style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                      ),),
                     ),
 
                   ]
