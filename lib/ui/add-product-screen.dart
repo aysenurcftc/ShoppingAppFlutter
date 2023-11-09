@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 
 class AddProductScreen extends StatelessWidget {
+
+
   const AddProductScreen({Key? key}) : super(key: key);
 
   @override
@@ -12,11 +14,8 @@ class AddProductScreen extends StatelessWidget {
     final double width = screenSize.size.width;
 
 
-
-
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         backgroundColor: Colors.grey.shade50,
         title: Center(
           child: Text("Ürün Bilgisi",
@@ -43,7 +42,8 @@ class AddProductScreen extends StatelessWidget {
             ),
 
             Container(
-              width: width ,
+              width: width,
+              height: 150,
               color: Colors.white,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,11 +65,11 @@ class AddProductScreen extends StatelessWidget {
                             width: 150,
                             height: 55,
                             decoration: BoxDecoration(
-                              color: Colors.white, // Container rengi
-                              borderRadius: BorderRadius.circular(20), // Köşeleri yuvarlaklaştırma
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: Colors.grey.shade600,// Kenar çizgisi rengi
-                                width: 1, // Kenar çizgisi kalınlığı
+                                color: Colors.grey.shade600,
+                                width: 1,
                               ),
                             ),
                             child: Icon(Icons.add,
@@ -95,12 +95,13 @@ class AddProductScreen extends StatelessWidget {
 
             Container(
               width: width,
-              height: 100,
+              height: 130,
               color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.only(left: 20,right: 20),
                 child: TextField(
-                  maxLength: 5,
+                  maxLength: 50,
+                  maxLines: 2,
                   decoration: InputDecoration(
                     hintText: "En az 5 karakterli ürün başlığı",
                     hintStyle: TextStyle(
@@ -126,15 +127,15 @@ class AddProductScreen extends StatelessWidget {
 
             Container(
               width: width,
-              height: 100,
+              height: 120,
               color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.only(left: 20,right: 20),
                 child: SizedBox(
                   height: 200,
                   child: TextField(
-                    minLines: 1,
-                    maxLines: 10,
+                    maxLength: 50,
+                    maxLines: 2,
                     keyboardType: TextInputType.multiline,
                     decoration: InputDecoration(
                       hintText: "Ürün açıklaması",
@@ -154,6 +155,7 @@ class AddProductScreen extends StatelessWidget {
               child: Container(
                 color: Colors.white,
                 width: width,
+                height: 60,
                 child: ListTile(
                   title: Row(
                     children: [
@@ -170,45 +172,20 @@ class AddProductScreen extends StatelessWidget {
               ),
             ),
 
+
             Padding(
               padding: const EdgeInsets.only(top: 5, bottom: 5),
               child: Container(
                 color: Colors.white,
                 width: width,
+                height: 60,
                 child: ListTile(
                   title: Row(
                     children: [
                       Text("Durumu",
                         style: TextStyle(
                           color: Colors.grey.shade600,
-                        ),),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios,
-                        color: Colors.grey.shade600,),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Container(
-                color: Colors.white,
-                width: width,
-                child: ListTile(
-                  title: Row(
-                    children: [
-                      SizedBox(
-                        height: 200,
-                        child: TextField(
-                          maxLines: 1,
-                          decoration: InputDecoration(
-                           hintText: "Fiyatı"
-                          ),
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                          ),),
+                        ),
                       ),
                       Spacer(),
                       Icon(Icons.arrow_forward_ios,
@@ -220,8 +197,30 @@ class AddProductScreen extends StatelessWidget {
             ),
 
 
+            Container(
+              width: width,
+              height: 100,
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20,right: 20,top: 20,bottom: 20),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: "Fiyatı",
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade600,
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ),
+
+
+
+
             Padding(
-              padding: const EdgeInsets.only(bottom: 25),
+              padding: const EdgeInsets.only(bottom: 25,top: 25),
               child: Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -231,7 +230,9 @@ class AddProductScreen extends StatelessWidget {
                   child: Text('Tamamla'),
                 ),
               ),
-            )
+            ),
+
+
 
           ],
         ),
@@ -239,3 +240,5 @@ class AddProductScreen extends StatelessWidget {
     );
   }
 }
+
+

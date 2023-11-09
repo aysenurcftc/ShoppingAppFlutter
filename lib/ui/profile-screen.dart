@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senior_project/service/auth.dart';
+import 'package:senior_project/ui/profile-detail-screen.dart';
 
 class ProfileScreen extends StatelessWidget {
 
@@ -18,7 +19,6 @@ class ProfileScreen extends StatelessWidget {
     var screenSize = MediaQuery.of(context);
     final double height = screenSize.size.height;
     final double width = screenSize.size.width;
-
 
     return Scaffold(
         body: Column(
@@ -53,14 +53,22 @@ class ProfileScreen extends StatelessWidget {
                   ),
 
                   Spacer(),
-                  Text("Sayfama git",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                    color: Colors.grey.shade600,
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfileDetailScreen()),
+                      );
+                    },
+                    child: Text("Sayfama git",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline,
+                      color: Colors.grey.shade600,
 
-                  ),),
+                    ),),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(left:10,right: 10),
                     child: Icon(Icons.arrow_forward_ios,
@@ -73,21 +81,29 @@ class ProfileScreen extends StatelessWidget {
 
             Padding(
               padding: const EdgeInsets.only(top: 15),
-              child: Container(
-                color: Colors.white,
-                width: width,
-                child: ListTile(
-                  leading: Icon(Icons.checkroom_outlined),
-                  title: Row(
-                    children: [
-                      Text("Ürünlerim",
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios,
-                        color: Colors.grey.shade600,),
-                    ],
+              child: GestureDetector(
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProfileDetailScreen()),
+                  );
+                },
+                child: Container(
+                  color: Colors.white,
+                  width: width,
+                  child: ListTile(
+                    leading: Icon(Icons.checkroom_outlined),
+                    title: Row(
+                      children: [
+                        Text("Ürünlerim",
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),),
+                        Spacer(),
+                        Icon(Icons.arrow_forward_ios,
+                          color: Colors.grey.shade600,),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -191,7 +207,6 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
 
-
             Container(
               color: Colors.white,
               width: width,
@@ -215,8 +230,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-
           ],
         )
     );

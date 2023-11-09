@@ -12,7 +12,6 @@ class ProductDetailScreen extends StatelessWidget {
   ProductDetailScreen(this.imagePath, this.productTitle, this.productPrice);
 
 
-
   @override
   Widget build(BuildContext context) {
 
@@ -142,6 +141,54 @@ class ProductDetailScreen extends StatelessWidget {
                 fontSize: 16,
               ),),
             ),
+
+            Container(
+              width: width,
+                height: 80,
+                color: Colors.white,
+                child: Padding(
+                  padding:  EdgeInsets.only(left: 18,right: 18,top: 10,bottom: 10),
+                  child: Text("Kuponlar&Kampanyalar",style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+
+                  ),
+
+                  ),
+                ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                width: width,
+                height: 100,
+                color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Soru&Cevap",style: TextStyle(
+                      fontSize: 20,
+                    ),),
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: "Satıcıya Sor",
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+
+
+
+
 
           ],
 
