@@ -1,10 +1,105 @@
+
+
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:senior_project/ui/categories/categories_secreen.dart';
+import 'package:senior_project/ui/categories/state_screen.dart';
+import 'package:senior_project/utils/utils.dart';
 
+import '../service/add_product.dart';
 
-class AddProductScreen extends StatelessWidget {
+class AddProductScreen extends StatefulWidget {
 
 
   const AddProductScreen({Key? key}) : super(key: key);
+
+  @override
+  State<AddProductScreen> createState() => _AddProductScreenState();
+}
+
+
+
+class _AddProductScreenState extends State<AddProductScreen> {
+
+  Uint8List? files;
+
+
+  FirestoreService firestoreService = FirestoreService();
+
+
+
+  var selected;
+  var selectedOption;
+
+  var productTitleController = TextEditingController();
+  var productExpController = TextEditingController();
+  var productPriceController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    productTitleController = TextEditingController();
+    productExpController = TextEditingController();
+    productPriceController = TextEditingController();
+  }
+
+
+  @override
+  void dispose() {
+    productTitleController.dispose();
+    productExpController.dispose();
+    productPriceController.dispose();
+    super.dispose();
+  }
+
+
+  _selectImage(BuildContext context) async {
+    return showDialog(context: context, builder: (context){
+      return SimpleDialog(
+        title: Text("Resim yükle"),
+        children: [
+
+          SimpleDialogOption(
+            padding: EdgeInsets.all(5),
+            child: Text("Resim çek"),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              Uint8List file = await pickImage(ImageSource.camera,);
+              setState(() {
+                files = file;
+              });
+            },
+          ),
+
+
+          SimpleDialogOption(
+            padding: EdgeInsets.all(5),
+            child: Text("Galeriden resim seç"),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              Uint8List file = await pickImage(ImageSource.gallery,);
+              setState(() {
+                files = file;
+              });
+            },
+          ),
+
+          SimpleDialogOption(
+            padding: EdgeInsets.all(5),
+            child: Text("Çık"),
+            onPressed: () async {
+              Navigator.of(context).pop();
+            },
+          )
+
+        ],
+      );
+    }
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -12,6 +107,8 @@ class AddProductScreen extends StatelessWidget {
     var screenSize = MediaQuery.of(context);
     final double height = screenSize.size.height;
     final double width = screenSize.size.width;
+
+
 
 
     return Scaffold(
@@ -27,6 +124,8 @@ class AddProductScreen extends StatelessWidget {
           ),
         ),
       ),
+
+
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,27 +142,34 @@ class AddProductScreen extends StatelessWidget {
 
             Container(
               width: width,
-              height: 150,
+              height: 230,
               color: Colors.white,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 26,bottom: 15,top: 15,),
-                    child: Text("En az 3 tane resim yükleyin",
+                    child: Text("Resim yükleyin",
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade600,
-                      ),),
+                      ),
+                    ),
                   ),
+
 
                   Row(
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(left: 20,right: 20,bottom: 20),
-                        child: Container(
+                        child: GestureDetector(
+                          onTap: (){
+                            _selectImage(context);
+                            print("fis $files");
+                          },
+                          child: Container(
                             width: 150,
-                            height: 55,
+                            height: 150,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
@@ -72,13 +178,28 @@ class AddProductScreen extends StatelessWidget {
                                 width: 1,
                               ),
                             ),
-                            child: Icon(Icons.add,
-                              color:Colors.grey.shade600, )
+                            child: files != null
+                                ? ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.memory(
+                                files!,
+                                fit: BoxFit.cover,
+                                width: 150,
+                                height: 55,
+                              ),
+                            )
+                                : Icon(
+                              Icons.add,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+
                         ),
                       )
                     ],
-                  )
-                ],
+                  ),
+
+          ],
               ),
             ),
 
@@ -100,6 +221,7 @@ class AddProductScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 20,right: 20),
                 child: TextField(
+                  controller: productTitleController,
                   maxLength: 50,
                   maxLines: 2,
                   decoration: InputDecoration(
@@ -134,6 +256,7 @@ class AddProductScreen extends StatelessWidget {
                 child: SizedBox(
                   height: 200,
                   child: TextField(
+                    controller: productExpController,
                     maxLength: 50,
                     maxLines: 2,
                     keyboardType: TextInputType.multiline,
@@ -156,17 +279,26 @@ class AddProductScreen extends StatelessWidget {
                 color: Colors.white,
                 width: width,
                 height: 60,
-                child: ListTile(
-                  title: Row(
-                    children: [
-                      Text("Kategorisi",
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios,
-                        color: Colors.grey.shade600,),
-                    ],
+                child: GestureDetector(
+                  onTap: () async{
+                    var selectedCategory = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CategoriesScreen()),
+                    );
+                    selected = selectedCategory;
+                  },
+                  child: ListTile(
+                    title: Row(
+                      children: [
+                        Text("Kategorisi",
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),),
+                        Spacer(),
+                        Icon(Icons.arrow_forward_ios,
+                          color: Colors.grey.shade600,),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -174,23 +306,31 @@ class AddProductScreen extends StatelessWidget {
 
 
             Padding(
-              padding: const EdgeInsets.only(top: 5, bottom: 5),
+              padding: const EdgeInsets.only(top: 20),
               child: Container(
                 color: Colors.white,
                 width: width,
                 height: 60,
-                child: ListTile(
-                  title: Row(
-                    children: [
-                      Text("Durumu",
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios,
-                        color: Colors.grey.shade600,),
-                    ],
+                child: GestureDetector(
+                  onTap: () async{
+                    var selectedOptions = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => StateScreen()),
+                    );
+                    selectedOption= selectedOptions;
+                  },
+                  child: ListTile(
+                    title: Row(
+                      children: [
+                        Text("Kullanım Durumu",
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),),
+                        Spacer(),
+                        Icon(Icons.arrow_forward_ios,
+                          color: Colors.grey.shade600,),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -204,6 +344,7 @@ class AddProductScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 20,right: 20,top: 20,bottom: 20),
                 child: TextField(
+                  controller: productPriceController,
                   decoration: InputDecoration(
                     hintText: "Fiyatı",
                     hintStyle: TextStyle(
@@ -218,27 +359,49 @@ class AddProductScreen extends StatelessWidget {
 
 
 
+              Padding(
+                padding: const EdgeInsets.only(bottom: 25,top: 25),
+                child: Center(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white, backgroundColor: Colors.pinkAccent, // foreground
+                    ),
+                    onPressed: () {
+                      firestoreService.addProductToFirestore(
+                        productTitleController.text,
+                        productExpController.text,
+                        double.parse(productPriceController.text),
+                        selected,
+                        selectedOption,
+                        files,
+                      );
 
-            Padding(
-              padding: const EdgeInsets.only(bottom: 25,top: 25),
-              child: Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: Colors.pinkAccent, // foreground
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Ürün başarıyla eklendi!'),
+                          duration: Duration(seconds: 5),
+                        ),
+                      );
+
+                      // Clear input fields
+                      productTitleController.clear();
+                      productExpController.clear();
+                      productPriceController.clear();
+                      setState(() {
+                        files = null;
+                      });
+                    },
+                    child: Text('Tamamla'),
                   ),
-                  onPressed: () { },
-                  child: Text('Tamamla'),
                 ),
               ),
-            ),
-
-
 
           ],
         ),
       ),
     );
+
+
   }
 }
-
 

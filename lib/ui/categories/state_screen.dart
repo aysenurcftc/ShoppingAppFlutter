@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ChildCategories extends StatelessWidget {
-  const ChildCategories({Key? key}) : super(key: key);
+class StateScreen extends StatelessWidget {
+  const StateScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -9,15 +9,16 @@ class ChildCategories extends StatelessWidget {
     final double width = screenSize.size.width;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Ürün Durumu"),
+      ),
+
       body: SingleChildScrollView(
         child: Column(
           children: [
-            buildCategoryTile(context, "Tüm Ürünler", Icons.apps_outlined, width),
-            buildCategoryTile(context, "Kız Çocuk", Icons.checkroom_outlined, width),
-            buildCategoryTile(context, "Erkek Çocuk", Icons.shopping_bag_rounded, width),
-            buildCategoryTile(context, "Oyuncak", Icons.diamond_outlined, width),
-            buildCategoryTile(context, "Bebek", Icons.directions_run, width),
-            buildCategoryTile(context, "Diğer", Icons.scatter_plot, width),
+            buildCategoryTile(context, "Kullanılmış", Icons.apps_outlined, width),
+            buildCategoryTile(context, "Yeni", Icons.checkroom_outlined, width),
+            buildCategoryTile(context, "Yeni&Etiketli", Icons.shopping_bag_rounded, width),
           ],
         ),
       ),

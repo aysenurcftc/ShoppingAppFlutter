@@ -20,14 +20,21 @@ class AuthService {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
 
-  /*
-  // get user details
-  Future<model.User> getUserDetails() async {
-    User currentUser = auth.currentUser!;
 
-    DocumentSnapshot documentSnapshot = await  _firestore.collection('users').doc(currentUser.uid).get();
-    return model.User.fromSnap(documentSnapshot);
-  }*/
+  Future<String?> getCurrentUserId() async {
+    try {
+      User? user = auth.currentUser;
+      if (user != null) {
+        return user.uid;
+      } else {
+        // Kullanıcı oturum açmamışsa null dönebilirsiniz.
+        return null;
+      }
+    } catch (e) {
+      print("Kullanıcı kimliği alınırken hata oluştu: $e");
+      return null;
+    }
+  }
 
 
   Future<void> signUp(BuildContext context, {
