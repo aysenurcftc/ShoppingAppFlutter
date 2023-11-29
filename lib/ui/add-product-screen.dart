@@ -8,7 +8,7 @@ import 'package:senior_project/ui/categories/categories_secreen.dart';
 import 'package:senior_project/ui/categories/state_screen.dart';
 import 'package:senior_project/utils/utils.dart';
 
-import '../service/add_product.dart';
+import '../service/product_service.dart';
 
 class AddProductScreen extends StatefulWidget {
 

@@ -2,15 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/ui/profile-detail-screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController _searchController = TextEditingController();
 
   void _startSearch() {
     String query = _searchController.text;
   }
 
-  AuthService authservice = AuthService();
+  AuthService authService = AuthService();
+  late Future<String?> username;
+
+
+  @override
+  void initState() {
+    super.initState();
+    username = authService.getCurrentUsername();
+  }
+
+
 
 
   @override
@@ -41,12 +56,26 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 20),
-                        child: Text("KullanıcıAdı",
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
+                        child: FutureBuilder<String?>(
+                          initialData: "Kullanıcı Adı",
+                          future: username,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              String? username = snapshot.data;
+                              return Text(
+                                username ?? 'KullanıcıAdı',
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text('Hata oluştu: ${snapshot.error}');
+                            } else {
+                              return CircularProgressIndicator();
+                            }
+                          },
                         ),
                       ),
                     ],
@@ -212,7 +241,7 @@ class ProfileScreen extends StatelessWidget {
               width: width,
               child: GestureDetector(
                 onTap: (){
-                  authservice.signOut(context);
+                  authService.signOut(context);
                 },
                 child: ListTile(
                   leading: Icon(Icons.arrow_back_outlined),
