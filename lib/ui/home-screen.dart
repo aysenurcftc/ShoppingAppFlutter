@@ -1,30 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:senior_project/models/product.dart';
+import 'package:senior_project/models/products.dart';
+import 'package:senior_project/service/auth.dart';
+import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/product_detail.dart';
 
-class HomeScreen extends StatelessWidget {
 
+
+
+class HomeScreen extends StatefulWidget {
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   TextEditingController _searchController = TextEditingController();
 
   void _startSearch() {
     String query = _searchController.text;
   }
 
-  final List<Product> newProducts = [
-    Product(imagePath: "img/zara_dress.jpg", productTitle: "Zara Elbise",productPrice: 100),
-    Product(imagePath: "img/zara_dress_2.jpg", productTitle: "Zara Elbise",productPrice: 100),
-    Product(imagePath: "img/zara_bluz.jpg", productTitle: "Zara Bluz",productPrice: 100),
-    Product(imagePath: "img/zara_bluz_2.jpg", productTitle: "Zara Bluz",productPrice: 100),
-    Product(imagePath: "img/zara_dress.jpg", productTitle: "Zara Elbise",productPrice: 100),
-    Product(imagePath: "img/zara_dress_2.jpg", productTitle: "Zara Elbise",productPrice: 100),
-    Product(imagePath: "img/zara_bluz.jpg", productTitle: "Zara Bluz",productPrice: 100),
-    Product(imagePath: "img/zara_bluz_2.jpg", productTitle: "Zara Bluz",productPrice: 100),
-  ];
 
 
+  final AuthService authService = AuthService();
+
+  final FirestoreService firestoreService = FirestoreService();
+
+  late Future<List<Product>> userProducts;
+
+  late Future<String?> username;
+
+  @override
+  void initState() {
+    super.initState();
+    userProducts = firestoreService.getUserProducts();
+    username = authService.getCurrentUsername();
+  }
 
   Color myColor = Color(0xFFF3E9E0);
-
 
   @override
   Widget build(BuildContext context) {
@@ -358,88 +371,118 @@ class HomeScreen extends StatelessWidget {
 
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: newProducts.map((product) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: 150,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            spreadRadius: 3,
-                            blurRadius: 5,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: GestureDetector(
-                        onTap: (){
-                          Navigator.push(context,MaterialPageRoute(builder: (context) => ProductDetailScreen(product.imagePath,product.productTitle,product.productPrice)));
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.asset(product.imagePath, width: 150),
-                                ),
-                                Positioned(
-                                  top: 10,
-                                  right: 10,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      // Kalp simgesine tıklama işlemi
-                                    },
-                                    child: Icon(
-                                      Icons.favorite_border,
-                                      color: Colors.grey.shade600,
-                                      size: 20,
-                                    ),
-                                  ),
+              child: FutureBuilder<List<Product>>(
+                future: userProducts,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    List<Product> products = snapshot.data ?? [];
+                    return Row(
+                      children: products.map((product) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            width: 150,
+                            height: 300,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  spreadRadius: 3,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
                                 ),
                               ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8, left: 6),
-                              child: Text(
-                                product.productTitle,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 15
-                                ),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProductDetailScreen(
+                                      product.image,
+                                      product.title,
+                                      product.price,
+                                      product.description,
+                                      product.category,
+                                      product.condition,
+                                      product.size,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          product.image,
+                                          width: 150,
+                                          height: 200,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 10,
+                                        right: 10,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            // Kalp simgesine tıklama işlemi
+                                          },
+                                          child: Icon(
+                                            Icons.favorite_border,
+                                            color: Colors.pink.shade400,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 8,
+                                      left: 6,
+                                    ),
+                                    child: Text(
+                                      product.title,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 10,
+                                      bottom: 5,
+                                      left: 6,
+                                    ),
+                                    child: Text(
+                                      product.price.toString() + "₺",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
-
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10,bottom: 5,left: 6),
-                              child: Text(
-                                product.productPrice.toString() + "₺",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  }
+                },
               ),
             ),
-
-
-
-
           ],
         ),
       ),

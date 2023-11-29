@@ -5,11 +5,16 @@ import 'package:senior_project/models/product.dart';
 
 class ProductDetailScreen extends StatelessWidget {
 
-  final String imagePath;
+  final String image;
   final String productTitle;
   final double productPrice;
+  final String description;
+  final String condition;
+  final String category;
+  final String size;
 
-  ProductDetailScreen(this.imagePath, this.productTitle, this.productPrice);
+  ProductDetailScreen(this.image, this.productTitle, this.productPrice, this.description,this.condition,
+      this.category, this.size);
 
 
   @override
@@ -33,8 +38,9 @@ class ProductDetailScreen extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(imagePath
-                    ,fit: BoxFit.cover,
+                    child: Image.network(
+                      image,
+                    fit: BoxFit.cover,
                   ),
                   ),
                   Positioned(
@@ -44,7 +50,7 @@ class ProductDetailScreen extends StatelessWidget {
                       onTap: () {},
                       child: Icon(
                         Icons.favorite_border,
-                        color: Colors.grey.shade600,
+                        color: Colors.pink.shade400,
                         size: 30,
                       ),
                     ),
@@ -57,12 +63,11 @@ class ProductDetailScreen extends StatelessWidget {
                       onTap: () {},
                       child: Icon(
                         Icons.share,
-                        color: Colors.grey.shade600,
+                        color: Colors.pink.shade400,
                         size: 30,
                       ),
                     ),
                   ),
-
 
                 ],
               ),
@@ -94,7 +99,7 @@ class ProductDetailScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 20,),
                   child: Icon(Icons.bookmark_border,
                   size: 30,
-                    color: Colors.grey.shade600,
+                    color: Colors.pink.shade400,
                   ),
                 ),
 
@@ -107,23 +112,36 @@ class ProductDetailScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 20,right: 10),
                   child: Icon(
                     Icons.local_offer_outlined,
-                    color: Colors.grey.shade600,
+                    color: Colors.pink.shade400,
 
                   ),
                 ),
-                Text("Kullanım Durumu ",
+                Text("Durumu: ",
                 style: TextStyle(
-                  color: Colors.grey.shade600,
+                  color: Colors.pink.shade400,
                 ),
+                ),
+                Text(category,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                  ),
                 ),
 
                 Spacer(),
                 Padding(
                   padding: const EdgeInsets.only(right: 25),
-                  child: Text("Beden: M",
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                    ),
+                  child: Row(
+                    children: [
+                      Text("Beden: ",
+                        style: TextStyle(
+                          color: Colors.pink.shade400,
+                        ),
+                      ),
+                      Text(size, style: TextStyle(
+                        color: Colors.grey.shade600,
+                      ),
+                      )
+                    ],
                   ),
                 ),
 

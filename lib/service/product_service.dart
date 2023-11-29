@@ -25,11 +25,13 @@ class FirestoreService {
     }
   }
 
-  Future<void> addProductToFirestore(String title,
+  Future<void> addProductToFirestore(
+      String title,
       String description,
       double price,
       String category,
       String condition,
+      String size,
       Uint8List? image,) async {
     try {
       String? userId = await auth.getCurrentUserId();
@@ -52,6 +54,7 @@ class FirestoreService {
           'title': title,
           'description': description,
           'price': price,
+          'size':size,
           'category': category,
           'condition': condition,
           'image': imageUrl,

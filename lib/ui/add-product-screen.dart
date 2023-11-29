@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:senior_project/ui/categories/categories_secreen.dart';
+import 'package:senior_project/ui/categories/size_screen.dart';
 import 'package:senior_project/ui/categories/state_screen.dart';
 import 'package:senior_project/utils/utils.dart';
 
@@ -32,6 +33,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   var selected;
   var selectedOption;
+  var selectedSize;
 
   var productTitleController = TextEditingController();
   var productExpController = TextEditingController();
@@ -306,7 +308,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
 
             Padding(
-              padding: const EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.only(top: 20,bottom: 20),
               child: Container(
                 color: Colors.white,
                 width: width,
@@ -335,6 +337,42 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 ),
               ),
             ),
+
+
+            Padding(
+              padding: const EdgeInsets.only(top: 20,bottom: 20),
+              child: Container(
+                color: Colors.white,
+                width: width,
+                height: 60,
+                child: GestureDetector(
+                  onTap: () async{
+                    var selectedOptions = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SizeScreen()),
+                    );
+                    selectedSize= selectedOptions;
+                  },
+                  child: ListTile(
+                    title: Row(
+                      children: [
+                        Text("Bedeni",
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),),
+                        Spacer(),
+                        Icon(Icons.arrow_forward_ios,
+                          color: Colors.grey.shade600,),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+
+
+
 
 
             Container(
@@ -373,6 +411,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         double.parse(productPriceController.text),
                         selected,
                         selectedOption,
+                        selectedSize,
                         files,
                       );
 
@@ -387,6 +426,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       productTitleController.clear();
                       productExpController.clear();
                       productPriceController.clear();
+                      selectedOption='';
+                      selected = '';
+                      selectedSize='';
                       setState(() {
                         files = null;
                       });

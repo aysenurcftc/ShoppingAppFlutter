@@ -9,6 +9,7 @@ class Product {
   late String category;
   late String condition;
   late String image;
+  late String size;
   late DateTime timestamp;
 
   // Constructor
@@ -20,6 +21,7 @@ class Product {
     required this.condition,
     required this.image,
     required this.timestamp,
+    required this.size,
   });
 
   // Named constructor to create a Product instance from a Map
@@ -30,6 +32,7 @@ class Product {
     category = data['category'] ?? '';
     condition = data['condition'] ?? '';
     image = data['image'] ?? '';
+    size = data['size'] ?? '';
     timestamp = (data['timestamp'] as Timestamp).toDate();
   }
 }
