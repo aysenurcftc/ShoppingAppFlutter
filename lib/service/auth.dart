@@ -13,7 +13,7 @@ import 'package:senior_project/ui/login/login-screen.dart';
 
 class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("users");
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final FirebaseAuth auth = FirebaseAuth.instance;
 
 
@@ -145,18 +145,18 @@ class AuthService {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Sign Out'),
-          content: Text('Are you sure you want to sign out?'),
+          title: Text('Çıkış Yap'),
+          content: Text('Çıkış yapmak istediğinizden emin misiniz?'),
           actions: <Widget>[
             TextButton(
-              child: Text('No'),
+              child: Text('Hayır'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
               child: Text(
-                'Yes',
+                'Evet',
                 style: TextStyle(
                   color: Colors.red,
                 ),
@@ -165,7 +165,7 @@ class AuthService {
                 try {
                   await auth.signOut();
                   Fluttertoast.showToast(
-                    msg: "Signed out",
+                    msg: "Çıkış yapıldı",
                     toastLength: Toast.LENGTH_LONG,
                   );
                   navigator.pushAndRemoveUntil(

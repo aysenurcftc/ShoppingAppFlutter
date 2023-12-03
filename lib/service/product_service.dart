@@ -54,12 +54,14 @@ class FirestoreService {
           'title': title,
           'description': description,
           'price': price,
-          'size':size,
+          'size': size,
           'category': category,
           'condition': condition,
           'image': imageUrl,
           'timestamp': FieldValue.serverTimestamp(),
         });
+
+        String productId = userProductsCollection.id;
       }
 
       print('Ürün başarıyla eklendi.');
@@ -93,6 +95,44 @@ class FirestoreService {
     }
     return [];
   }
+
+
+  Future<List<Product>> getAllUsersProducts() async {
+    try {
+      // Tüm kullanıcıları içeren koleksiyon referansı
+      CollectionReference usersCollection = FirebaseFirestore.instance.collection('users');
+
+      // Koleksiyondaki tüm belgeleri al
+      QuerySnapshot usersSnapshot = await usersCollection.get();
+
+      // Tüm kullanıcıların ürünlerini içeren liste
+      List<Product> allUsersProducts = [];
+
+      // Her kullanıcının ürünlerini çek
+      for (QueryDocumentSnapshot userDoc in usersSnapshot.docs) {
+        String userId = userDoc.id;
+
+        // Kullanıcının ürünlerini içeren koleksiyon referansı
+        CollectionReference productsCollection = usersCollection.doc(userId).collection('products');
+
+        // Kullanıcının ürünlerini içeren belgeleri al
+        QuerySnapshot productsSnapshot = await productsCollection.get();
+
+        // Kullanıcının ürünlerini listeye ekle
+        List<Product> userProducts = productsSnapshot.docs
+            .map((doc) => Product.fromMap(doc.data() as Map<String, dynamic>))
+            .toList();
+
+        allUsersProducts.addAll(userProducts);
+      }
+
+      return allUsersProducts;
+    } catch (e) {
+      print('Ürünleri çekerken bir hata oluştu: $e');
+      return [];
+    }
+  }
+
 
 
 

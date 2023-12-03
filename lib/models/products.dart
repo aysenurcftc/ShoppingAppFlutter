@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
-
 class Product {
   late String title;
   late String description;
@@ -10,7 +9,9 @@ class Product {
   late String condition;
   late String image;
   late String size;
+  late String likes;
   late DateTime timestamp;
+  late bool isLiked;
 
   // Constructor
   Product({
@@ -22,11 +23,14 @@ class Product {
     required this.image,
     required this.timestamp,
     required this.size,
+    this.isLiked = false,
+
   });
 
-  // Named constructor to create a Product instance from a Map
+
   Product.fromMap(Map<String, dynamic> data) {
     title = data['title'] ?? '';
+    isLiked = data['isLiked'] ?? false;
     description = data['description'] ?? '';
     price = (data['price'] ?? 0.0).toDouble();
     category = data['category'] ?? '';

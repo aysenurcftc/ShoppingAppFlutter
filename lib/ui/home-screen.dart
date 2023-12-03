@@ -6,7 +6,6 @@ import 'package:senior_project/ui/product_detail.dart';
 
 
 
-
 class HomeScreen extends StatefulWidget {
 
   @override
@@ -21,19 +20,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
-
   final AuthService authService = AuthService();
-
   final FirestoreService firestoreService = FirestoreService();
-
   late Future<List<Product>> userProducts;
-
   late Future<String?> username;
+  bool isLiked = false;
 
   @override
   void initState() {
     super.initState();
-    userProducts = firestoreService.getUserProducts();
+    userProducts = firestoreService.getAllUsersProducts();
     username = authService.getCurrentUsername();
   }
 
@@ -155,11 +151,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.asset("img/home-like.jpg",
-                              width: 150,),
+                            child: Image.asset("img/home-coupon.jpg",
+                              width: 150,
+                            height: 130,
+                              fit: BoxFit.cover,),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 10),
+                            padding: const EdgeInsets.only(top: 8),
                             child: Text("Kupon Fırsatları",
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -191,11 +189,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.asset("img/home-2.jpg",
-                              width: 150,),
+                            child: Image.asset("img/home-like.jpg",
+                              width: 149,
+                            height: 130,
+                            fit: BoxFit.cover,),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 15),
+                            padding: const EdgeInsets.only(top: 8),
                             child: Text("En Beğenilenler",
                               textAlign: TextAlign.center,),
                           ),
@@ -226,12 +226,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.asset("img/home-taki.jpg",
-                              width: 150,),
+                            child: Image.asset("img/home-jell.jpg",
+                              width: 150,
+                              height: 130,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
-                            child: Text("En Beğenilen Aksesuarlar",
+                            child: Text("Aksesuarlar",
                               textAlign: TextAlign.center,),
                           ),
                         ],
@@ -262,10 +265,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: Image.asset("img/home-ceket.jpg",
-                              width: 150,),
+                              width: 150,
+                              height: 130,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 15),
+                            padding: const EdgeInsets.only(top: 8),
                             child: Text("Favori Ceketler"),
                           ),
                         ],
@@ -296,19 +302,21 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.asset("img/home-mu.jpg",
-                              width: 150,),
+                            child: Image.asset("img/make-up.jpg",
+                              width: 150,
+                              height: 130,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
-                            child: Text("En Sevilen Cilt Bakım Ürünleri",
+                            child: Text("Cilt Bakım",
                               textAlign: TextAlign.center,),
                           ),
                         ],
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),
@@ -372,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: FutureBuilder<List<Product>>(
-                future: userProducts,
+                future: userProducts ,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
@@ -386,7 +394,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
                             width: 150,
-                            height: 300,
+                            height: 280,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20.0),
@@ -433,14 +441,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Positioned(
                                         top: 10,
                                         right: 10,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            // Kalp simgesine tıklama işlemi
-                                          },
-                                          child: Icon(
-                                            Icons.favorite_border,
+                                        child: Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.white,
+                                          ),
+                                          padding: EdgeInsets.all(1),
+                                          child: IconButton(
+                                            icon: Icon(
+                                              product.isLiked  ? Icons.favorite : Icons.favorite_border,
+                                            ),
                                             color: Colors.pink.shade400,
-                                            size: 20,
+                                            iconSize: 20,
+                                            onPressed: () {
+                                              setState(() {
+                                                product.isLiked = !product.isLiked;
+                                              });
+                                          },
                                           ),
                                         ),
                                       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:senior_project/models/product.dart';
 
 
 
@@ -46,25 +45,39 @@ class ProductDetailScreen extends StatelessWidget {
                   Positioned(
                     top: 50,
                     right: 10,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Icon(
-                        Icons.favorite_border,
-                        color: Colors.pink.shade400,
-                        size: 30,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      padding: EdgeInsets.all(8),
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: Icon(
+                          Icons.favorite_border,
+                          color: Colors.pink.shade400,
+                          size: 30,
+                        ),
                       ),
                     ),
                   ),
 
                   Positioned(
                     top: 50,
-                    right: 50,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Icon(
-                        Icons.share,
-                        color: Colors.pink.shade400,
-                        size: 30,
+                    right: 60,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      padding: EdgeInsets.all(8),
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: Icon(
+                          Icons.share,
+                          color: Colors.pink.shade400,
+                          size: 30,
+                        ),
                       ),
                     ),
                   ),
@@ -151,9 +164,7 @@ class ProductDetailScreen extends StatelessWidget {
 
             Padding(
               padding: const EdgeInsets.only(left: 18,right: 18,top: 10,bottom: 20),
-              child: Text("İnceltilmiş viskoz kumaştan relaxed fit bluz. Manşetleri düğmeli, pilili, "
-                  "yırtmaçlı uzun kollu, V yaka. Kontrast fular detaylı. Yanları yırtmaçlı asimetrik "
-                  "kenarlı. Önü düğmeli.",
+              child: Text( description,
               style: TextStyle(
                 color: Colors.grey.shade600,
                 fontSize: 16,
@@ -177,7 +188,7 @@ class ProductDetailScreen extends StatelessWidget {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.only(top: 10,bottom: 50,right: 10,left: 10),
               child: Container(
                 width: width,
                 height: 100,
@@ -212,7 +223,23 @@ class ProductDetailScreen extends StatelessWidget {
 
         ),
       ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check),
+            label: 'Teklif Ver',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag_outlined),
+            label: 'Sepete Ekle',
+          ),
+        ],
+          selectedItemColor: Colors.grey.shade600,
+          unselectedItemColor: Colors.grey.shade600,
+        ),
     );
+
+
   }
 }
 
