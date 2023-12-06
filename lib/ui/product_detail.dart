@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 
-
 class ProductDetailScreen extends StatelessWidget {
 
   final String image;
@@ -236,6 +235,13 @@ class ProductDetailScreen extends StatelessWidget {
         ],
           selectedItemColor: Colors.grey.shade600,
           unselectedItemColor: Colors.grey.shade600,
+          onTap: (int index){
+            if(index==0){
+
+            }else if(index==1){
+
+            }
+          },
         ),
     );
 

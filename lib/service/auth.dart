@@ -85,6 +85,7 @@ class AuthService {
             'name': name,
             'surname': surname,
             'phone': phoneNumber,
+            'like' : [],
           });
         }
 

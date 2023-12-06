@@ -8,6 +8,7 @@ import 'package:senior_project/ui/categories/categories_secreen.dart';
 import 'package:senior_project/ui/categories/size_screen.dart';
 import 'package:senior_project/ui/categories/state_screen.dart';
 import 'package:senior_project/utils/utils.dart';
+import 'package:uuid/uuid.dart';
 
 import '../service/product_service.dart';
 
@@ -405,13 +406,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       foregroundColor: Colors.white, backgroundColor: Colors.pinkAccent, // foreground
                     ),
                     onPressed: () {
+                      String uuid = Uuid().v1();
                       firestoreService.addProductToFirestore(
                         productTitleController.text,
                         productExpController.text,
-                        double.parse(productPriceController.text),
+                        productPriceController.text,
+                        selectedSize,
                         selected,
                         selectedOption,
-                        selectedSize,
+                        uuid,
                         files,
                       );
 

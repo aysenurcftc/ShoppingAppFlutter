@@ -14,7 +14,6 @@ class ProfileDetailScreen extends StatelessWidget {
     final double width = screenSize.size.width;
 
 
-
     return DefaultTabController(
       length: 2,
       child: Scaffold(

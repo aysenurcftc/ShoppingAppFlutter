@@ -16,15 +16,17 @@ class SizeScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            buildCategoryTile(context, "32", Icons.checkroom_outlined, width),
-            buildCategoryTile(context, "34", Icons.shopping_bag_rounded, width),
-            buildCategoryTile(context, "36", Icons.shopping_bag_rounded, width),
-            buildCategoryTile(context, "38", Icons.shopping_bag_rounded, width),
-            buildCategoryTile(context, "40", Icons.shopping_bag_rounded, width),
-            buildCategoryTile(context, "42", Icons.shopping_bag_rounded, width),
-            buildCategoryTile(context, "44", Icons.shopping_bag_rounded, width),
-            buildCategoryTile(context, "46", Icons.shopping_bag_rounded, width),
-            buildCategoryTile(context, "48", Icons.shopping_bag_rounded, width),
+            buildCategoryTile(context, "32", Icons.add, width),
+            buildCategoryTile(context, "34", Icons.add, width),
+            buildCategoryTile(context, "36", Icons.add, width),
+            buildCategoryTile(context, "38", Icons.add, width),
+            buildCategoryTile(context, "40", Icons.add, width),
+            buildCategoryTile(context, "42", Icons.add, width),
+            buildCategoryTile(context, "44", Icons.add, width),
+            buildCategoryTile(context, "46", Icons.add, width),
+            buildCategoryTile(context, "48", Icons.add, width),
+            buildCategoryTile(context, "Diğer", Icons.add, width),
+
           ],
         ),
       ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:senior_project/models/products.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/service/product_service.dart';
+import 'package:senior_project/ui/add-product-screen.dart';
+import 'package:senior_project/ui/new_products_screen.dart';
 import 'package:senior_project/ui/product_detail.dart';
 
 
@@ -40,8 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
     var screenSize = MediaQuery.of(context);
     final double height = screenSize.size.height;
     final double width = screenSize.size.width;
-
-
 
 
     return Scaffold(
@@ -91,12 +91,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 20,
                               ),),
                           ),
-                          Text("Hemen Başla",
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 15,
-                              decoration: TextDecoration.underline,
-                            ),),
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => AddProductScreen()),
+                              );
+                            },
+                            child: Text("Hemen Başla",
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 15,
+                                decoration: TextDecoration.underline,
+                              ),),
+                          ),
                         ],
                       ),
 
@@ -365,12 +373,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.grey.shade600,
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                    ),),
+
+                    ),
+                  ),
                   Spacer(),
-                  Text("Tümünü gör",
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 15,
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => NewProductScreen(userProducts)),
+                      );
+                    },
+                    child: Text("Tümünü gör",
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 15,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ],
@@ -415,7 +434,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     builder: (context) => ProductDetailScreen(
                                       product.image,
                                       product.title,
-                                      product.price,
+                                      product.price as double,
                                       product.description,
                                       product.category,
                                       product.condition,
@@ -455,10 +474,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                             color: Colors.pink.shade400,
                                             iconSize: 20,
-                                            onPressed: () {
+                                            onPressed: () async {
                                               setState(() {
                                                 product.isLiked = !product.isLiked;
                                               });
+                                              await firestoreService.likeProduct(product.uid, product.isLiked);
+
                                           },
                                           ),
                                         ),
@@ -483,9 +504,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       left: 6,
                                     ),
                                     child: Text(
-                                      product.price.toString() + "₺",
+                                      product.price + "₺",
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15,
                                       ),

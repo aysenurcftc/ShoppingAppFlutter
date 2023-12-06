@@ -4,12 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Product {
   late String title;
   late String description;
-  late double price;
+  late String price;
+  late String size;
   late String category;
   late String condition;
+  late String uid;
   late String image;
-  late String size;
-  late String likes;
   late DateTime timestamp;
   late bool isLiked;
 
@@ -18,11 +18,12 @@ class Product {
     required this.title,
     required this.description,
     required this.price,
+    required this.size,
     required this.category,
     required this.condition,
+    required this.uid,
     required this.image,
     required this.timestamp,
-    required this.size,
     this.isLiked = false,
 
   });
@@ -30,13 +31,14 @@ class Product {
 
   Product.fromMap(Map<String, dynamic> data) {
     title = data['title'] ?? '';
-    isLiked = data['isLiked'] ?? false;
     description = data['description'] ?? '';
-    price = (data['price'] ?? 0.0).toDouble();
+    price = data['price'] ?? '';
     category = data['category'] ?? '';
     condition = data['condition'] ?? '';
-    image = data['image'] ?? '';
     size = data['size'] ?? '';
+    uid = data['uid'] ?? '';
+    image = data['image'] ?? '';
     timestamp = (data['timestamp'] as Timestamp).toDate();
+    isLiked = data['isLiked'] ?? false;
   }
 }

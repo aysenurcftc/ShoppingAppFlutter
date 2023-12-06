@@ -5,13 +5,15 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:senior_project/models/products.dart';
 import 'package:senior_project/service/auth.dart';
 
+
 class FirestoreService {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
   AuthService auth = AuthService();
 
-  // Adding image to Firebase Storage
+
+
   Future<String> uploadImageToStorage(String childName, Uint8List file) async {
     try {
       String uniqueImageName = '${DateTime.now().millisecondsSinceEpoch}_${_auth.currentUser!.uid}.jpg';
@@ -28,10 +30,11 @@ class FirestoreService {
   Future<void> addProductToFirestore(
       String title,
       String description,
-      double price,
+      String price,
+      String size,
       String category,
       String condition,
-      String size,
+      String uid,
       Uint8List? image,) async {
     try {
       String? userId = await auth.getCurrentUserId();
@@ -40,14 +43,12 @@ class FirestoreService {
         if (image != null) {
           imageUrl = await uploadImageToStorage('products', image);
         }
-
-        // Reference to the users collection
         DocumentReference userDocRef =
         FirebaseFirestore.instance.collection('users').doc(userId);
 
-        // Reference to the user's products collection
         CollectionReference userProductsCollection =
         userDocRef.collection('products');
+
 
         // Add product to the user's products collection
         await userProductsCollection.add({
@@ -58,6 +59,7 @@ class FirestoreService {
           'category': category,
           'condition': condition,
           'image': imageUrl,
+          'uid' : uid,
           'timestamp': FieldValue.serverTimestamp(),
         });
 
@@ -75,14 +77,11 @@ class FirestoreService {
     try {
       String? userId = await auth.getCurrentUserId();
       if (userId != null) {
-        // Kullanıcının ürünlerini içeren koleksiyon referansı
         CollectionReference productsCollection =
         FirebaseFirestore.instance.collection('users').doc(userId).collection('products');
 
-        // Koleksiyondaki tüm belgeleri al
         QuerySnapshot querySnapshot = await productsCollection.get();
 
-        // Belge verilerini çıkart ve Product listesine dönüştür
         List<Product> userProducts = querySnapshot.docs
             .map((doc) => Product.fromMap(doc.data() as Map<String, dynamic>))
             .toList();
@@ -91,6 +90,7 @@ class FirestoreService {
       }
     } catch (e) {
       print('Ürünleri çekerken bir hata oluştu: $e');
+      print('Hata ayrıntıları: ${e.toString()}');
       return [];
     }
     return [];
@@ -101,28 +101,16 @@ class FirestoreService {
     try {
       // Tüm kullanıcıları içeren koleksiyon referansı
       CollectionReference usersCollection = FirebaseFirestore.instance.collection('users');
-
-      // Koleksiyondaki tüm belgeleri al
       QuerySnapshot usersSnapshot = await usersCollection.get();
-
-      // Tüm kullanıcıların ürünlerini içeren liste
       List<Product> allUsersProducts = [];
-
-      // Her kullanıcının ürünlerini çek
       for (QueryDocumentSnapshot userDoc in usersSnapshot.docs) {
         String userId = userDoc.id;
-
-        // Kullanıcının ürünlerini içeren koleksiyon referansı
         CollectionReference productsCollection = usersCollection.doc(userId).collection('products');
-
-        // Kullanıcının ürünlerini içeren belgeleri al
         QuerySnapshot productsSnapshot = await productsCollection.get();
 
-        // Kullanıcının ürünlerini listeye ekle
         List<Product> userProducts = productsSnapshot.docs
             .map((doc) => Product.fromMap(doc.data() as Map<String, dynamic>))
             .toList();
-
         allUsersProducts.addAll(userProducts);
       }
 
@@ -133,6 +121,36 @@ class FirestoreService {
     }
   }
 
+
+
+  Future<void> likeProduct(String productIdentifier, bool isLiked) async {
+    try {
+      String? userId = await auth.getCurrentUserId();
+
+      if (userId != null) {
+        DocumentReference userDocRef = FirebaseFirestore.instance.collection('users').doc(userId);
+
+        if (!(await userDocRef.get()).exists) {
+          // Eğer kullanıcı belgesi yoksa oluşturun
+          await userDocRef.set({'likes': []});
+        }
+
+        CollectionReference userLikesCollection = userDocRef.collection('likes');
+
+        if (isLiked) {
+          // Eğer ürün beğenilmişse, beğeniyi kaldır
+          await userLikesCollection.doc(productIdentifier).delete();
+          print('Ürün beğenisi kaldırıldı.');
+        } else {
+          // Eğer ürün daha önce beğenilmemişse, beğeni ekle
+          await userLikesCollection.doc(productIdentifier).set({'timestamp': FieldValue.serverTimestamp()});
+          print('Ürün beğenildi.');
+        }
+      }
+    } catch (e) {
+      print('Ürünü beğenirken bir hata oluştu: $e');
+    }
+  }
 
 
 
