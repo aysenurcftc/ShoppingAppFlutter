@@ -5,6 +5,7 @@ import 'package:senior_project/ui/categories/categories_secreen.dart';
 import 'package:senior_project/ui/home-screen.dart';
 import 'package:senior_project/ui/notification_screen.dart';
 import 'package:senior_project/ui/profile-screen.dart';
+import 'package:senior_project/ui/shopping_basket_screen.dart';
 
 import '../widgets/bottomnavbar.dart';
 
@@ -82,7 +83,11 @@ class _HomeState extends State<Home> {
             ),
             IconButton(
               onPressed: () {
-
+                /*
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ShoppingBasketScreen()),
+                );*/
               },
               icon: Icon(
                 Icons.shopping_bag_outlined,

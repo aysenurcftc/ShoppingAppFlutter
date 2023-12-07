@@ -3,6 +3,7 @@ import 'package:senior_project/service/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:senior_project/models/products.dart';
 import 'package:senior_project/service/product_service.dart';
+import 'package:senior_project/ui/user_settings.dart';
 
 class ProfileGeneral extends StatefulWidget {
 
@@ -89,7 +90,12 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  IconButton(onPressed: (){}, icon: Icon(Icons.settings,
+                  IconButton(onPressed: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => UserSettingsScreen()),
+                    );
+                  }, icon: Icon(Icons.settings,
                   size: 28,)),
                   Spacer(),
                   Padding(

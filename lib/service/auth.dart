@@ -87,6 +87,7 @@ class AuthService {
             'phone': phoneNumber,
             'like' : [],
           });
+
         }
 
         Fluttertoast.showToast(
@@ -100,6 +101,11 @@ class AuthService {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
     }
   }
+
+
+
+
+
 
   Future<User?> signIn(BuildContext context,
       {required String email, required String password}) async {

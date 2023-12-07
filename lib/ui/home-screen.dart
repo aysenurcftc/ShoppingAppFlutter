@@ -21,12 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
     String query = _searchController.text;
   }
 
-
   final AuthService authService = AuthService();
   final FirestoreService firestoreService = FirestoreService();
   late Future<List<Product>> userProducts;
   late Future<String?> username;
-  bool isLiked = false;
 
   @override
   void initState() {
@@ -434,11 +432,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                     builder: (context) => ProductDetailScreen(
                                       product.image,
                                       product.title,
-                                      product.price as double,
+                                      product.price,
                                       product.description,
                                       product.category,
                                       product.condition,
                                       product.size,
+                                      product.isLiked,
+                                      product.uid,
                                     ),
                                   ),
                                 );
@@ -478,7 +478,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               setState(() {
                                                 product.isLiked = !product.isLiked;
                                               });
-                                              await firestoreService.likeProduct(product.uid, product.isLiked);
+                                              await firestoreService.likeProduct(product.uid, !product.isLiked);
 
                                           },
                                           ),

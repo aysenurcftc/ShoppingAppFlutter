@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/ui/profile-detail-screen.dart';
+import 'package:senior_project/ui/user_settings.dart';
 
 class ProfileScreen extends StatefulWidget {
 
@@ -216,21 +217,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             Padding(
               padding: const EdgeInsets.only(top: 20),
-              child: Container(
-                color: Colors.white,
-                width: width,
-                child: ListTile(
-                  leading: Icon(Icons.settings),
-                  title: Row(
-                    children: [
-                      Text("Ayarlar",
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios,
-                        color: Colors.grey.shade600,),
-                    ],
+              child: GestureDetector(
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UserSettingsScreen()),
+                  );
+                },
+                child: Container(
+                  color: Colors.white,
+                  width: width,
+                  child: ListTile(
+                    leading: Icon(Icons.settings),
+                    title: Row(
+                      children: [
+                        Text("Ayarlar",
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),),
+                        Spacer(),
+                        Icon(Icons.arrow_forward_ios,
+                          color: Colors.grey.shade600,),
+                      ],
+                    ),
                   ),
                 ),
               ),

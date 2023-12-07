@@ -35,7 +35,6 @@ class MyApp extends StatelessWidget {
 class AuthenticationWrapper extends StatelessWidget {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   @override
   Widget build(BuildContext context) {
     if (_auth.currentUser != null) {

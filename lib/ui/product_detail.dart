@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:senior_project/service/product_service.dart';
+import 'package:senior_project/ui/shopping_basket_screen.dart';
 
 
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailScreen extends StatefulWidget {
 
   final String image;
   final String productTitle;
-  final double productPrice;
+  final String productPrice;
   final String description;
   final String condition;
   final String category;
   final String size;
+  late bool isLiked;
+  final String uid;
 
   ProductDetailScreen(this.image, this.productTitle, this.productPrice, this.description,this.condition,
-      this.category, this.size);
+      this.category, this.size, this.isLiked, this.uid);
 
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  final FirestoreService firestoreService = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +47,7 @@ class ProductDetailScreen extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Image.network(
-                      image,
+                      widget.image,
                     fit: BoxFit.cover,
                   ),
                   ),
@@ -49,13 +59,13 @@ class ProductDetailScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: Colors.white,
                       ),
-                      padding: EdgeInsets.all(8),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Icon(
-                          Icons.favorite_border,
+                      padding: EdgeInsets.all(2),
+                      child: Center(
+                        child: IconButton(
+                          icon : Icon( Icons.share,),
+                          onPressed: (){},
                           color: Colors.pink.shade400,
-                          size: 30,
+                          iconSize: 30,
                         ),
                       ),
                     ),
@@ -63,20 +73,26 @@ class ProductDetailScreen extends StatelessWidget {
 
                   Positioned(
                     top: 50,
-                    right: 60,
+                    right: 70,
                     child: Container(
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
                       ),
-                      padding: EdgeInsets.all(8),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Icon(
-                          Icons.share,
-                          color: Colors.pink.shade400,
-                          size: 30,
+                      padding: EdgeInsets.all(2),
+                      child: IconButton(
+                        icon: Icon(
+                          widget.isLiked  ? Icons.favorite : Icons.favorite_border,
                         ),
+                        color: Colors.pink.shade400,
+                        iconSize: 30,
+                        onPressed: () async {
+                          setState(() {
+                            widget.isLiked = !widget.isLiked;
+                          });
+                          await firestoreService.likeProduct(widget.uid, !widget.isLiked);
+
+                        },
                       ),
                     ),
                   ),
@@ -90,7 +106,7 @@ class ProductDetailScreen extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 10,bottom: 10,left: 15),
-                  child: Text(productTitle,
+                  child: Text(widget.productTitle,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -101,7 +117,7 @@ class ProductDetailScreen extends StatelessWidget {
                 Spacer(),
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
-                  child: Text(productPrice.toString()+ "₺",
+                  child: Text(widget.productPrice+ "₺",
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.grey.shade600,
@@ -133,7 +149,7 @@ class ProductDetailScreen extends StatelessWidget {
                   color: Colors.pink.shade400,
                 ),
                 ),
-                Text(category,
+                Text(widget.category,
                   style: TextStyle(
                     color: Colors.grey.shade600,
                   ),
@@ -149,7 +165,7 @@ class ProductDetailScreen extends StatelessWidget {
                           color: Colors.pink.shade400,
                         ),
                       ),
-                      Text(size, style: TextStyle(
+                      Text(widget.size, style: TextStyle(
                         color: Colors.grey.shade600,
                       ),
                       )
@@ -163,7 +179,7 @@ class ProductDetailScreen extends StatelessWidget {
 
             Padding(
               padding: const EdgeInsets.only(left: 18,right: 18,top: 10,bottom: 20),
-              child: Text( description,
+              child: Text( widget.description,
               style: TextStyle(
                 color: Colors.grey.shade600,
                 fontSize: 16,
@@ -239,7 +255,11 @@ class ProductDetailScreen extends StatelessWidget {
             if(index==0){
 
             }else if(index==1){
-
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ShoppingBasketScreen(widget.image, widget.productTitle, widget.productPrice,
+                widget.description, widget.condition, widget.category, widget.size, widget.isLiked, widget.uid)),
+              );
             }
           },
         ),
