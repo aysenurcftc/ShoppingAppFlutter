@@ -9,11 +9,16 @@ class NewProductScreen extends StatefulWidget {
 
   NewProductScreen(this.userProducts);
 
+
   @override
   State<NewProductScreen> createState() => _NewProductScreenState();
 }
 
 class _NewProductScreenState extends State<NewProductScreen> {
+
+
+  bool isLiked = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,13 +112,13 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                       padding: EdgeInsets.all(1),
                                       child: IconButton(
                                         icon: Icon(
-                                          products[index].isLiked  ? Icons.favorite : Icons.favorite_border,
+                                           isLiked  ? Icons.favorite : Icons.favorite_border,
                                         ),
                                         color: Colors.pink.shade400,
                                         iconSize: 20,
                                         onPressed: () {
                                           setState(() {
-                                            products[index].isLiked = !products[index].isLiked;
+
                                           });
                                         },
                                       ),

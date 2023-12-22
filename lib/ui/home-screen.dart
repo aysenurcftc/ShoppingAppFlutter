@@ -26,13 +26,16 @@ class _HomeScreenState extends State<HomeScreen> {
   final FirestoreService firestoreService = FirestoreService();
   late Future<List<Product>> userProducts;
   late Future<String?> username;
-  bool isLiked = false;
+
+  Set<int> begenilenUrunler = Set<int>();
+
 
   @override
   void initState() {
     super.initState();
     userProducts = firestoreService.getAllUsersProducts();
     username = authService.getCurrentUsername();
+
   }
 
   Color myColor = Color(0xFFF3E9E0);
@@ -409,6 +412,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     List<Product> products = snapshot.data ?? [];
                     return Row(
                       children: products.map((product) {
+                        final int index = products.indexOf(product);
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
@@ -434,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     builder: (context) => ProductDetailScreen(
                                       product.image,
                                       product.title,
-                                      product.price as double,
+                                      product.price,
                                       product.description,
                                       product.category,
                                       product.condition,
@@ -453,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Image.network(
                                           product.image,
                                           width: 150,
-                                          height: 200,
+                                          height: 190,
                                           fit: BoxFit.cover,
                                         ),
                                       ),
@@ -470,15 +474,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                           padding: EdgeInsets.all(1),
                                           child: IconButton(
                                             icon: Icon(
-                                              product.isLiked  ? Icons.favorite : Icons.favorite_border,
+                                              begenilenUrunler.contains(index) ? Icons.favorite : Icons.favorite_border,
                                             ),
                                             color: Colors.pink.shade400,
                                             iconSize: 20,
                                             onPressed: () async {
                                               setState(() {
-                                                product.isLiked = !product.isLiked;
+                                                if (begenilenUrunler.contains(index)) {
+                                                  begenilenUrunler.remove(index);
+                                                } else {
+                                                  begenilenUrunler.add(index);
+                                                }
                                               });
-                                              await firestoreService.likeProduct(product.uid, product.isLiked);
 
                                           },
                                           ),

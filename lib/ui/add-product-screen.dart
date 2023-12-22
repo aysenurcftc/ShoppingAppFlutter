@@ -416,6 +416,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         selectedOption,
                         uuid,
                         files,
+
                       );
 
                       ScaffoldMessenger.of(context).showSnackBar(

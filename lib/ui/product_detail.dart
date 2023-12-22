@@ -5,7 +5,7 @@ class ProductDetailScreen extends StatelessWidget {
 
   final String image;
   final String productTitle;
-  final double productPrice;
+  final String productPrice;
   final String description;
   final String condition;
   final String category;

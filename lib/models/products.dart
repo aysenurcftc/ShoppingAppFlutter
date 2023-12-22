@@ -11,7 +11,7 @@ class Product {
   late String uid;
   late String image;
   late DateTime timestamp;
-  late bool isLiked;
+
 
   // Constructor
   Product({
@@ -24,7 +24,7 @@ class Product {
     required this.uid,
     required this.image,
     required this.timestamp,
-    this.isLiked = false,
+
 
   });
 
@@ -39,6 +39,6 @@ class Product {
     uid = data['uid'] ?? '';
     image = data['image'] ?? '';
     timestamp = (data['timestamp'] as Timestamp).toDate();
-    isLiked = data['isLiked'] ?? false;
+
   }
 }
