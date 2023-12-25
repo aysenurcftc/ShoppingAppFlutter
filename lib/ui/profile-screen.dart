@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/ui/profile-detail-screen.dart';
+import 'package:senior_project/ui/user_settings.dart';
 
 class ProfileScreen extends StatefulWidget {
 
@@ -108,157 +109,174 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.only(top: 15),
-              child: GestureDetector(
-                onTap: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfileDetailScreen()),
-                  );
-                },
-                child: Container(
-                  color: Colors.white,
-                  width: width,
-                  child: ListTile(
-                    leading: Icon(Icons.checkroom_outlined),
-                    title: Row(
-                      children: [
-                        Text("Ürünlerim",
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                          ),),
-                        Spacer(),
-                        Icon(Icons.arrow_forward_ios,
-                          color: Colors.grey.shade600,),
-                      ],
+            Flexible(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: GestureDetector(
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ProfileDetailScreen()),
+                          );
+                        },
+                        child: Container(
+                          color: Colors.white,
+                          width: width,
+                          child: ListTile(
+                            leading: Icon(Icons.checkroom_outlined),
+                            title: Row(
+                              children: [
+                                Text("Ürünlerim",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                  ),),
+                                Spacer(),
+                                Icon(Icons.arrow_forward_ios,
+                                  color: Colors.grey.shade600,),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
-
-            Container(
-              color: Colors.white,
-              width: width,
-              child: ListTile(
-                leading: Icon(Icons.shopping_bag_outlined),
-                title: Row(
-                  children: [
-                    Text("Siparişlerim",
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                      ),),
-                    Spacer(),
-                    Icon(Icons.arrow_forward_ios,
-                      color: Colors.grey.shade600,),
+              
+                    Container(
+                      color: Colors.white,
+                      width: width,
+                      child: ListTile(
+                        leading: Icon(Icons.shopping_bag_outlined),
+                        title: Row(
+                          children: [
+                            Text("Siparişlerim",
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                              ),),
+                            Spacer(),
+                            Icon(Icons.arrow_forward_ios,
+                              color: Colors.grey.shade600,),
+                          ],
+                        ),
+                      ),
+                    ),
+              
+                    Container(
+                      color: Colors.white,
+                      width: width,
+                      child: ListTile(
+                        leading: Icon(Icons.discount_outlined),
+                        title: Row(
+                          children: [
+                            Text("Kuponlarım",
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                              ),),
+                            Spacer(),
+                            Icon(Icons.arrow_forward_ios,
+                              color: Colors.grey.shade600,),
+                          ],
+                        ),
+                      ),
+                    ),
+              
+                    Container(
+                      color: Colors.white,
+                      width: width,
+                      child: ListTile(
+                        leading: Icon(Icons.favorite_border_rounded),
+                        title: Row(
+                          children: [
+                            Text("Favorilerim",
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                              ),),
+                            Spacer(),
+                            Icon(Icons.arrow_forward_ios,
+                              color: Colors.grey.shade600,),
+                          ],
+                        ),
+                      ),
+                    ),
+              
+                    Container(
+                      color: Colors.white,
+                      width: width,
+                      child: ListTile(
+                        leading: Icon(Icons.wallet),
+                        title: Row(
+                          children: [
+                            Text("Cüzdanım",
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                              ),),
+                            Spacer(),
+                            Icon(Icons.arrow_forward_ios,
+                              color: Colors.grey.shade600,),
+                          ],
+                        ),
+                      ),
+                    ),
+              
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: GestureDetector(
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => UserSettingsScreen()),
+                          );
+                        },
+                        child: Container(
+                          color: Colors.white,
+                          width: width,
+                          child: ListTile(
+                            leading: Icon(Icons.settings),
+                            title: Row(
+                              children: [
+                                Text("Ayarlar",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                  ),),
+                                Spacer(),
+                                Icon(Icons.arrow_forward_ios,
+                                  color: Colors.grey.shade600,),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+              
+                    Container(
+                      color: Colors.white,
+                      width: width,
+                      child: GestureDetector(
+                        onTap: (){
+                          authService.signOut(context);
+                        },
+                        child: ListTile(
+                          leading: Icon(Icons.arrow_back_outlined),
+                          title: Row(
+                            children: [
+                              Text("Çıkış Yap",
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                ),),
+                              Spacer(),
+                              Icon(Icons.arrow_forward_ios,
+                                color: Colors.grey.shade600,),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-
-            Container(
-              color: Colors.white,
-              width: width,
-              child: ListTile(
-                leading: Icon(Icons.discount_outlined),
-                title: Row(
-                  children: [
-                    Text("Kuponlarım",
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                      ),),
-                    Spacer(),
-                    Icon(Icons.arrow_forward_ios,
-                      color: Colors.grey.shade600,),
-                  ],
-                ),
-              ),
-            ),
-
-            Container(
-              color: Colors.white,
-              width: width,
-              child: ListTile(
-                leading: Icon(Icons.favorite_border_rounded),
-                title: Row(
-                  children: [
-                    Text("Favorilerim",
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                      ),),
-                    Spacer(),
-                    Icon(Icons.arrow_forward_ios,
-                      color: Colors.grey.shade600,),
-                  ],
-                ),
-              ),
-            ),
-
-            Container(
-              color: Colors.white,
-              width: width,
-              child: ListTile(
-                leading: Icon(Icons.wallet),
-                title: Row(
-                  children: [
-                    Text("Cüzdanım",
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                      ),),
-                    Spacer(),
-                    Icon(Icons.arrow_forward_ios,
-                      color: Colors.grey.shade600,),
-                  ],
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Container(
-                color: Colors.white,
-                width: width,
-                child: ListTile(
-                  leading: Icon(Icons.settings),
-                  title: Row(
-                    children: [
-                      Text("Ayarlar",
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios,
-                        color: Colors.grey.shade600,),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            Container(
-              color: Colors.white,
-              width: width,
-              child: GestureDetector(
-                onTap: (){
-                  authService.signOut(context);
-                },
-                child: ListTile(
-                  leading: Icon(Icons.arrow_back_outlined),
-                  title: Row(
-                    children: [
-                      Text("Çıkış Yap",
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios,
-                        color: Colors.grey.shade600,),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            )
           ],
         )
     );

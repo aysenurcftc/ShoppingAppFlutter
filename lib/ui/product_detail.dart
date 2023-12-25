@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:senior_project/models/basket_product.dart';
+import 'package:senior_project/models/products.dart';
+import 'package:senior_project/service/product_service.dart';
+import 'package:senior_project/ui/shopping_basket_screen.dart';
+import 'package:senior_project/utils/basket_provider.dart';
 
 
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailScreen extends StatefulWidget {
 
   final String image;
   final String productTitle;
@@ -10,10 +16,17 @@ class ProductDetailScreen extends StatelessWidget {
   final String condition;
   final String category;
   final String size;
+  final String uid;
 
   ProductDetailScreen(this.image, this.productTitle, this.productPrice, this.description,this.condition,
-      this.category, this.size);
+      this.category, this.size, this.uid);
 
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  final FirestoreService firestoreService = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +50,12 @@ class ProductDetailScreen extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Image.network(
-                      image,
-                    fit: BoxFit.cover,
+                      widget.image,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                   ),
                   ),
+
                   Positioned(
                     top: 50,
                     right: 10,
@@ -49,13 +64,13 @@ class ProductDetailScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: Colors.white,
                       ),
-                      padding: EdgeInsets.all(8),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Icon(
-                          Icons.favorite_border,
+                      padding: EdgeInsets.all(2),
+                      child: Center(
+                        child: IconButton(
+                          icon : Icon( Icons.share,),
+                          onPressed: (){},
                           color: Colors.pink.shade400,
-                          size: 30,
+                          iconSize: 30,
                         ),
                       ),
                     ),
@@ -63,20 +78,47 @@ class ProductDetailScreen extends StatelessWidget {
 
                   Positioned(
                     top: 50,
-                    right: 60,
+                    left: 10,
                     child: Container(
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
                       ),
-                      padding: EdgeInsets.all(8),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Icon(
-                          Icons.share,
+                      padding: EdgeInsets.all(2),
+                      child: Center(
+                        child: IconButton(
+                          icon : Icon( Icons.arrow_back,),
+                          onPressed: (){
+                            Navigator.pop(context);
+                          },
                           color: Colors.pink.shade400,
-                          size: 30,
+                          iconSize: 30,
                         ),
+                      ),
+                    ),
+                  ),
+
+                  Positioned(
+                    top: 50,
+                    right: 70,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      padding: EdgeInsets.all(2),
+                      child: IconButton(
+                        icon: Icon(
+                  Icons.favorite_border
+                        ),
+                        color: Colors.pink.shade400,
+                        iconSize: 30,
+                        onPressed: () async {
+                          setState(() {
+
+                          });
+
+                        },
                       ),
                     ),
                   ),
@@ -90,7 +132,7 @@ class ProductDetailScreen extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 10,bottom: 10,left: 15),
-                  child: Text(productTitle,
+                  child: Text(widget.productTitle,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -101,7 +143,7 @@ class ProductDetailScreen extends StatelessWidget {
                 Spacer(),
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
-                  child: Text(productPrice.toString()+ "₺",
+                  child: Text(widget.productPrice+ "₺",
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.grey.shade600,
@@ -133,7 +175,7 @@ class ProductDetailScreen extends StatelessWidget {
                   color: Colors.pink.shade400,
                 ),
                 ),
-                Text(category,
+                Text(widget.category,
                   style: TextStyle(
                     color: Colors.grey.shade600,
                   ),
@@ -149,7 +191,7 @@ class ProductDetailScreen extends StatelessWidget {
                           color: Colors.pink.shade400,
                         ),
                       ),
-                      Text(size, style: TextStyle(
+                      Text(widget.size, style: TextStyle(
                         color: Colors.grey.shade600,
                       ),
                       )
@@ -163,7 +205,7 @@ class ProductDetailScreen extends StatelessWidget {
 
             Padding(
               padding: const EdgeInsets.only(left: 18,right: 18,top: 10,bottom: 20),
-              child: Text( description,
+              child: Text( widget.description,
               style: TextStyle(
                 color: Colors.grey.shade600,
                 fontSize: 16,
@@ -222,25 +264,48 @@ class ProductDetailScreen extends StatelessWidget {
 
         ),
       ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.check),
-            label: 'Teklif Ver',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag_outlined),
-            label: 'Sepete Ekle',
-          ),
-        ],
-          selectedItemColor: Colors.grey.shade600,
-          unselectedItemColor: Colors.grey.shade600,
-          onTap: (int index){
-            if(index==0){
+        bottomNavigationBar: Consumer<BasketProvider>(
+          builder: (BuildContext context, BasketProvider value, Widget? child) {
+            return  BottomNavigationBar(
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.check),
+                  label: 'Teklif Ver',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.shopping_bag_outlined),
+                  label: 'Sepete Ekle',
+                ),
+              ],
+              selectedItemColor: Colors.grey.shade600,
+              unselectedItemColor: Colors.grey.shade600,
+              onTap: (int index){
+                if(index==0){
 
-            }else if(index==1){
+                }else if(index==1){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ShoppingBasketScreen()),
+                  );
 
-            }
+                  final product = basketProduct(
+                    image: widget.image,
+                    title: widget.productTitle,
+                    price: widget.productPrice,
+                    description: widget.description,
+                    condition: widget.condition,
+                    category: widget.category,
+                    size: widget.size,
+                    uid: widget.uid,
+                  );
+
+                  Provider.of<BasketProvider>(context, listen: false).addToBasket(product);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Ürün sepete eklendi')),
+                  );
+                }
+              },
+            );
           },
         ),
     );

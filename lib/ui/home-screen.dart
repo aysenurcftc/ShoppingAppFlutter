@@ -21,13 +21,14 @@ class _HomeScreenState extends State<HomeScreen> {
     String query = _searchController.text;
   }
 
-
   final AuthService authService = AuthService();
   final FirestoreService firestoreService = FirestoreService();
   late Future<List<Product>> userProducts;
   late Future<String?> username;
 
-  Set<int> begenilenUrunler = Set<int>();
+
+  Set<int> liked = Set<int>();
+
 
 
   @override
@@ -413,6 +414,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     return Row(
                       children: products.map((product) {
                         final int index = products.indexOf(product);
+                        final bool isLiked = liked.contains(index);
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
@@ -443,6 +445,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       product.category,
                                       product.condition,
                                       product.size,
+                                      product.uid,
                                     ),
                                   ),
                                 );
@@ -474,16 +477,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                           padding: EdgeInsets.all(1),
                                           child: IconButton(
                                             icon: Icon(
-                                              begenilenUrunler.contains(index) ? Icons.favorite : Icons.favorite_border,
+                                             isLiked ? Icons.favorite : Icons.favorite_border,
                                             ),
                                             color: Colors.pink.shade400,
                                             iconSize: 20,
                                             onPressed: () async {
                                               setState(() {
-                                                if (begenilenUrunler.contains(index)) {
-                                                  begenilenUrunler.remove(index);
+                                                if (isLiked) {
+                                                  // If liked, remove from set
+                                                  liked.remove(index);
                                                 } else {
-                                                  begenilenUrunler.add(index);
+                                                  // If not liked, add to set
+                                                  liked.add(index);
                                                 }
                                               });
 

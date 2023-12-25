@@ -3,6 +3,7 @@ import 'package:senior_project/service/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:senior_project/models/products.dart';
 import 'package:senior_project/service/product_service.dart';
+import 'package:senior_project/ui/user_settings.dart';
 
 class ProfileGeneral extends StatefulWidget {
 
@@ -40,99 +41,112 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
     final double width = screenSize.size.width;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
+      body: Column(
+        children: [
+        Container(
+        color: Colors.white,
+        height: 130,
+        width: width,
+        child: Row(
           children: [
-          Container(
-          color: Colors.white,
-          height: 130,
-          width: width,
-          child: Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20,top: 8,bottom: 5),
-                    child: Image.asset("img/profile.jpg",
-                      width: 80,
-                      height: 80,
-                    ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20,top: 8,bottom: 5),
+                  child: Image.asset("img/profile.jpg",
+                    width: 80,
+                    height: 80,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 30),
-                    child: FutureBuilder<String?>(
-                      initialData: "Kullanıcı Adı",
-                      future: username,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          String? username = snapshot.data;
-                          return Text(
-                            username ?? 'KullanıcıAdı',
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Text('Hata oluştu: ${snapshot.error}');
-                        } else {
-                          return CircularProgressIndicator();
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              Spacer(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  IconButton(onPressed: (){}, icon: Icon(Icons.settings,
-                  size: 28,)),
-                  Spacer(),
-                  Padding(
-                    padding: EdgeInsets.only(right: 8,bottom: 8),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding:  EdgeInsets.only(right: 6),
-                          child: Text("Takip: 0",
-                            style: TextStyle(
-                            fontSize: 15,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 30),
+                  child: FutureBuilder<String?>(
+                    initialData: "Kullanıcı Adı",
+                    future: username,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        String? username = snapshot.data;
+                        return Text(
+                          username ?? 'KullanıcıAdı',
+                          style: TextStyle(
                             color: Colors.grey.shade600,
-                              fontWeight: FontWeight.bold
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
                           ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 6),
-                          child: Text("Takipçi: 0",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.grey.shade600,
-                              fontWeight: FontWeight.bold
-                            ),),
-                        ),
-                        Text("Favori: 0",style: TextStyle(
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Hata oluştu: ${snapshot.error}');
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Spacer(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Row(
+                  children: [
+                    IconButton(onPressed: (){
+                      Navigator.pop(context);
+                    }, icon: Icon(Icons.arrow_back)),
+                    IconButton(onPressed: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => UserSettingsScreen()),
+                      );
+                    }, icon: Icon(Icons.settings,
+                    size: 28,)),
+                  ],
+                ),
+                Spacer(),
+                Padding(
+                  padding: EdgeInsets.only(right: 8,bottom: 8),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding:  EdgeInsets.only(right: 6),
+                        child: Text("Takip: 0",
+                          style: TextStyle(
                           fontSize: 15,
                           color: Colors.grey.shade600,
-                          fontWeight: FontWeight.bold
-                        ),),
-                      ],
-                    ),
+                            fontWeight: FontWeight.bold
+                        ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(right: 6),
+                        child: Text("Takipçi: 0",
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.bold
+                          ),),
+                      ),
+                      Text("Favori: 0",style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.bold
+                      ),),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
-        
-          Column(
+      ),
+
+        SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-          
+
               FutureBuilder<List<Product>>(
                 future: userProducts,
                 builder: (context, snapshot) {
@@ -178,7 +192,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                             itemCount: products.length,
                             itemBuilder: (context, index) {
                               return Container(
-                                width: 120,
+                                width: 150,
                                 height: 200,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -201,7 +215,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                                           borderRadius: BorderRadius.circular(10),
                                           child: Image.network(
                                             products[index].image,
-                                            width: 150,
+                                            width: double.infinity,
                                             height: 200,
                                             fit: BoxFit.cover,
 
@@ -241,16 +255,16 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                   }
                 },
               ),
-          
-          
-          
-          
+
+
+
+
             ],
           ),
-        
-        
-          ]
         ),
+
+
+        ]
       ),
     );
   }

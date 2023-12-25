@@ -2,8 +2,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:senior_project/ui/bottomnav-screen.dart';
 import 'package:senior_project/ui/login/login-screen.dart';
+import 'package:senior_project/utils/basket_provider.dart';
 
 
 
@@ -19,15 +21,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-          scaffoldBackgroundColor: Colors.grey.shade50,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => BasketProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+            scaffoldBackgroundColor: Colors.grey.shade50,
+        ),
+        home: AuthenticationWrapper()
       ),
-      home: AuthenticationWrapper()
     );
   }
 }
@@ -35,7 +42,6 @@ class MyApp extends StatelessWidget {
 class AuthenticationWrapper extends StatelessWidget {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   @override
   Widget build(BuildContext context) {
     if (_auth.currentUser != null) {
