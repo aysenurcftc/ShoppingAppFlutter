@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/ui/profile-detail-screen.dart';
 import 'package:senior_project/ui/user_settings.dart';
+import 'package:senior_project/utils/user_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
 
@@ -57,25 +59,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 20),
-                        child: FutureBuilder<String?>(
-                          initialData: "Kullanıcı Adı",
-                          future: username,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
-                              String? username = snapshot.data;
-                              return Text(
-                                username ?? 'KullanıcıAdı',
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Text('Hata oluştu: ${snapshot.error}');
-                            } else {
-                              return CircularProgressIndicator();
-                            }
+                        child: Consumer<UserProvider>(
+                          builder: (BuildContext context, UserProvider value, Widget? child) {
+                            return Text(
+                              value.username ?? 'KullanıcıAdı',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -96,8 +89,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fontWeight: FontWeight.bold,
                       decoration: TextDecoration.underline,
                       color: Colors.grey.shade600,
-
-                    ),),
+                    ),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left:10,right: 10),

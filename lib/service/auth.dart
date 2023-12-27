@@ -32,6 +32,30 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>?> getCurrentUser() async {
+    try {
+      User? user = auth.currentUser;
+
+      if (user != null) {
+        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+            .collection("users")
+            .doc(user.uid)
+            .get();
+
+        Map<String, dynamic>? userData = userSnapshot.data() as Map<String, dynamic>?;
+
+        return userData;
+      } else {
+        // User not signed in
+        return null;
+      }
+    } catch (e) {
+      print("Error while getting user data: $e");
+      return null;
+    }
+  }
+
+
 
   Future<String?> getCurrentUsername() async {
     try {
@@ -101,6 +125,7 @@ class AuthService {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
     }
   }
+
 
 
 

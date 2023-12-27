@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:senior_project/ui/bottomnav-screen.dart';
 import 'package:senior_project/ui/login/login-screen.dart';
 import 'package:senior_project/utils/basket_provider.dart';
+import 'package:senior_project/utils/user_provider.dart';
 
 
 
@@ -24,6 +25,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => BasketProvider()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+
       ],
       child: MaterialApp(
         title: 'Flutter Demo',

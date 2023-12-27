@@ -1,9 +1,12 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:senior_project/models/products.dart';
 import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/user_settings.dart';
+import 'package:senior_project/utils/user_provider.dart';
 
 class ProfileGeneral extends StatefulWidget {
 
@@ -60,27 +63,18 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 30),
-                  child: FutureBuilder<String?>(
-                    initialData: "Kullanıcı Adı",
-                    future: username,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        String? username = snapshot.data;
-                        return Text(
-                          username ?? 'KullanıcıAdı',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('Hata oluştu: ${snapshot.error}');
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    },
+                  padding:  EdgeInsets.only(left: 30),
+                  child:  Consumer<UserProvider>(
+                    builder: (BuildContext context, UserProvider value, Widget? child) {
+                      return Text(
+                        value.username ?? 'KullanıcıAdı',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      );
+                  },
                   ),
                 ),
               ],

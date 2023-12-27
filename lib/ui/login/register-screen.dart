@@ -89,7 +89,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -115,6 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
+
 
                     Container(
                       child: Padding(

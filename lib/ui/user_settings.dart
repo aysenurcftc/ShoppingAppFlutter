@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:senior_project/ui/user_info_update.dart';
 
 class UserSettingsScreen extends StatelessWidget {
   const UserSettingsScreen({Key? key}) : super(key: key);
@@ -16,22 +17,25 @@ class UserSettingsScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            buildCategoryTile(context, "Profil Ayarları", Icons.settings, width),
-            buildCategoryTile(context, "Şifremi Değiştir", Icons.settings, width),
-            buildCategoryTile(context, "Kayıtlı Bilgilerim", Icons.settings, width),
-            buildCategoryTile(context, "Bildirim Ayarları",Icons.settings, width),
+            buildCategoryTile(context, "Kullanıcı Bilgilerim", Icons.person_2, width,UserInfoUpdate()),
+            buildCategoryTile(context, "Şifremi Değiştir", Icons.settings, width,UserInfoUpdate()),
+            buildCategoryTile(context, "Kayıtlı Bilgilerim", Icons.settings, width,UserInfoUpdate()),
+            buildCategoryTile(context, "Bildirim Ayarları",Icons.settings, width,UserInfoUpdate()),
           ],
         ),
       ),
     );
   }
 
-  Widget buildCategoryTile(BuildContext context, String title, IconData icon, double width) {
+  Widget buildCategoryTile(BuildContext context, String title, IconData icon, double width, Widget destinationScreen) {
     return Padding(
       padding: const EdgeInsets.only(top: 5),
       child: GestureDetector(
         onTap: () {
-          Navigator.pop(context, title);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => destinationScreen),
+          );
         },
         child: Container(
           color: Colors.white,
