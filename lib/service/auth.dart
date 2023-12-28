@@ -56,6 +56,29 @@ class AuthService {
   }
 
 
+  Future<bool> updatePassword(String currentPassword, String newPassword) async {
+    try {
+      // Get the current user
+      User? currentUser = auth.currentUser;
+
+      if (currentUser != null) {
+        AuthCredential credential =
+        EmailAuthProvider.credential(email: currentUser.email!, password: currentPassword);
+        await currentUser.reauthenticateWithCredential(credential);
+        // Update the password
+        await currentUser.updatePassword(newPassword);
+        return true; // Password update successful
+      } else {
+        print('User is not logged in');
+        return false; // User is not logged in
+      }
+    } on FirebaseAuthException catch (e) {
+      print('Error updating password: $e');
+      return false; // Password update failed
+    }
+  }
+
+
 
   Future<String?> getCurrentUsername() async {
     try {

@@ -30,7 +30,7 @@ class UserProvider with ChangeNotifier {
       Map<String, dynamic>? userData = userSnapshot.data() as Map<String, dynamic>?;
 
       if (userData != null) {
-        _username = userData['name'] ?? '';
+        _username = userData['userName'] ?? '';
       }
     }
   }

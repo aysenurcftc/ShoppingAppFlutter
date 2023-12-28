@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:senior_project/ui/user_info_update.dart';
+import 'package:senior_project/ui/user_password_update.dart';
 
 class UserSettingsScreen extends StatelessWidget {
   const UserSettingsScreen({Key? key}) : super(key: key);
@@ -18,9 +19,10 @@ class UserSettingsScreen extends StatelessWidget {
         child: Column(
           children: [
             buildCategoryTile(context, "Kullanıcı Bilgilerim", Icons.person_2, width,UserInfoUpdate()),
-            buildCategoryTile(context, "Şifremi Değiştir", Icons.settings, width,UserInfoUpdate()),
-            buildCategoryTile(context, "Kayıtlı Bilgilerim", Icons.settings, width,UserInfoUpdate()),
-            buildCategoryTile(context, "Bildirim Ayarları",Icons.settings, width,UserInfoUpdate()),
+            buildCategoryTile(context, "Adres Bilgilerim", Icons.home, width,UserInfoUpdate()),
+            buildCategoryTile(context, "Kayıtlı Kartlarım", Icons.credit_card, width,UserInfoUpdate()),
+            buildCategoryTile(context, "E-Posta değişikliği",Icons.mail, width,UserInfoUpdate()),
+            buildCategoryTile(context, "Şifre değişikliği",Icons.password, width,UserPasswordUpdate()),
           ],
         ),
       ),
