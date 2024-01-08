@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:senior_project/utils/basket_provider.dart';
+import 'package:senior_project/providers/basket_provider.dart';
 
 class ShoppingBasketScreen extends StatefulWidget {
 

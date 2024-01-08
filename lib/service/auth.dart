@@ -1,11 +1,15 @@
 
 
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:senior_project/resources/storage_methods.dart';
 import 'package:senior_project/ui/bottomnav-screen.dart';
 import 'package:senior_project/ui/login/login-screen.dart';
 
@@ -15,6 +19,7 @@ class AuthService {
   final userCollection = FirebaseFirestore.instance.collection("users");
 
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 
   Future<String?> getCurrentUserId() async {
@@ -31,6 +36,9 @@ class AuthService {
       return null;
     }
   }
+
+
+
 
   Future<Map<String, dynamic>?> getCurrentUser() async {
     try {
@@ -80,6 +88,7 @@ class AuthService {
 
 
 
+
   Future<String?> getCurrentUsername() async {
     try {
       User? user = auth.currentUser;
@@ -103,6 +112,8 @@ class AuthService {
   }
 
 
+
+  /*
   Future<void> signUp(BuildContext context, {
     required String name,
     required String surname,
@@ -110,6 +121,7 @@ class AuthService {
     required String email,
     required String phoneNumber,
     required String password,
+    required Uint8List file,
   }) async {
     final navigator = Navigator.of(context);
 
@@ -126,6 +138,8 @@ class AuthService {
         if (currentUser != null) {
           final user = currentUser;
 
+          String photoUrl = await StorageMethods().uploadImageToStorage('profilePics', file, false);
+
           await userCollection.doc(user.uid).set({
             'userName': userName,
             'email': email,
@@ -133,6 +147,9 @@ class AuthService {
             'surname': surname,
             'phone': phoneNumber,
             'like' : [],
+            'followers' : [],
+            'following' : [],
+            'photoUrl': photoUrl,
           });
 
         }
@@ -147,6 +164,83 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
     }
+  }*/
+
+
+
+  Future<String> signupUser ({
+    required String name,
+    required String surname,
+    required String userName,
+    required String email,
+    required String password,
+    required Uint8List file,
+
+  }) async{
+
+    String res = "Some error occured!";
+    try{
+
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp();
+      }
+
+      if(email.isNotEmpty || password.isNotEmpty || userName.isNotEmpty || name.isNotEmpty || surname.isNotEmpty || file != null){
+
+        //register user
+        UserCredential cred = await auth.createUserWithEmailAndPassword(email: email, password: password);
+        print(cred.user!.uid);
+
+        String photoUrl = await StorageMethods().uploadImageToStorage("profilePics", file, false);
+
+        //add user to database
+        await _firestore.collection("users").doc(cred.user!.uid).set({
+          'name' : name,
+          'surname' : surname,
+          'username' : userName,
+          'uid' : cred.user!.uid,
+          'email' : email,
+          'followers' : [],
+          'following' : [],
+          'photoUrl' : photoUrl,
+        });
+
+        res = "success";
+      }
+    }
+    catch(err){
+      print('Hata yakalandı: $err');
+      res = err.toString();
+    }
+    return res;
+  }
+
+
+
+  //login in user
+
+  Future<String> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    String res = "Some error occured!";
+
+    try{
+      if(email.isNotEmpty || password.isNotEmpty){
+        await auth.signInWithEmailAndPassword(email: email, password: password);
+        res = "success";
+
+      }
+      else{
+        res = "Please enter all the fields";
+      }
+
+    }
+    catch(err){
+      res = err.toString();
+    }
+    return res;
+
   }
 
 
@@ -155,6 +249,7 @@ class AuthService {
 
 
 
+  /*
   Future<User?> signIn(BuildContext context,
       {required String email, required String password}) async {
     final navigator = Navigator.of(context);
@@ -177,7 +272,7 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
     }
-  }
+  }*/
 
   Future<UserCredential> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -192,6 +287,9 @@ class AuthService {
 
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
+
+
+
 
   Future<void> signOut(BuildContext context) async {
     final navigator = Navigator.of(context);

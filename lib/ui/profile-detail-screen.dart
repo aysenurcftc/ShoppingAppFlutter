@@ -4,7 +4,10 @@ import 'package:senior_project/ui/sale-product-screen.dart';
 
 
 class ProfileDetailScreen extends StatelessWidget {
-  const ProfileDetailScreen({Key? key}) : super(key: key);
+
+
+
+
 
   @override
   Widget build(BuildContext context) {

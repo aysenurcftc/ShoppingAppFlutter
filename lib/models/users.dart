@@ -7,6 +7,7 @@ class User {
   late String username;
   late String email;
   late String phone;
+
   late String password;
 
 

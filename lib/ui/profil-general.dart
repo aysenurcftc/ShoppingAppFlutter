@@ -1,17 +1,22 @@
 
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:senior_project/models/products.dart';
 import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/user_settings.dart';
-import 'package:senior_project/utils/user_provider.dart';
+import 'package:senior_project/utils/utils.dart';
+
+
 
 class ProfileGeneral extends StatefulWidget {
 
 
-  ProfileGeneral({Key? key}) : super(key: key);
+
 
   @override
   State<ProfileGeneral> createState() => _ProfileGeneralState();
@@ -24,13 +29,61 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
   late Future<List<Product>> userProducts;
   late Future<String?> username;
 
+  late String? uid;
+
+  var userData = {};
+  int followers = 0;
+  int following = 0;
+  bool isFollowing = false;
+  bool isLoading = false;
+
 
   @override
   void initState() {
     super.initState();
-    userProducts = firestoreService.getUserProducts();
+    userProducts =  firestoreService.getUserProducts();
     username = authService.getCurrentUsername();
+    fetchData();
   }
+
+  Future<void> fetchData() async {
+    uid = await authService.getCurrentUserId();
+    getData(uid!);
+  }
+
+  getData(String userId) async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      var userSnap = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      // Kullanıcının takipçi ve takip ettikleri sayısını al
+      followers = userSnap.data()!['followers'].length;
+      following = userSnap.data()!['following'].length;
+
+      // Kullanıcı takip ediliyor mu kontrol et
+      isFollowing = userSnap
+          .data()!['followers']
+          .contains(FirebaseAuth.instance.currentUser!.uid);
+
+      // Kullanıcı bilgilerini güncelle
+      userData = userSnap.data()!;
+      setState(() {});
+    } catch (e) {
+      showSnackBar(
+        context,
+        e.toString(),
+      );
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
 
 
 
@@ -43,12 +96,16 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
     final double height = screenSize.size.height;
     final double width = screenSize.size.width;
 
-    return Scaffold(
+    return isLoading
+        ? const Center(
+        child: CircularProgressIndicator(),
+        )
+        : Scaffold(
       body: Column(
         children: [
         Container(
         color: Colors.white,
-        height: 130,
+        height: 180,
         width: width,
         child: Row(
           children: [
@@ -63,7 +120,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                   ),
                 ),
                 Padding(
-                  padding:  EdgeInsets.only(left: 30),
+                  padding:  EdgeInsets.only(left: 35),
                   child:  Consumer<UserProvider>(
                     builder: (BuildContext context, UserProvider value, Widget? child) {
                       return Text(
@@ -77,6 +134,19 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                   },
                   ),
                 ),
+
+                Padding(
+                  padding: const EdgeInsets.only(left: 25,top: 10),
+                  child: ElevatedButton(onPressed: (){},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pinkAccent.shade100,
+                      ),
+                      child: Text("Takip",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),),
+                  ),
+                )
               ],
             ),
             Spacer(),
@@ -103,7 +173,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                   child: Row(
                     children: [
                       Padding(
-                        padding:  EdgeInsets.only(right: 6),
+                        padding:  EdgeInsets.only(right: 8),
                         child: Text("Takip: 0",
                           style: TextStyle(
                           fontSize: 15,
@@ -113,7 +183,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(right: 6),
+                        padding: EdgeInsets.only(right: 8),
                         child: Text("Takipçi: 0",
                           style: TextStyle(
                             fontSize: 15,
@@ -121,11 +191,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                             fontWeight: FontWeight.bold
                           ),),
                       ),
-                      Text("Favori: 0",style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.bold
-                      ),),
+
                     ],
                   ),
                 ),
@@ -140,7 +206,6 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               FutureBuilder<List<Product>>(
                 future: userProducts,
                 builder: (context, snapshot) {
@@ -152,7 +217,6 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                     List<Product>? products = snapshot.data;
                     if (products != null && products.isNotEmpty) {
                       return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
                             padding: EdgeInsets.only(top: 10, left: 10),
@@ -179,64 +243,67 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                             physics: BouncingScrollPhysics(),
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                                mainAxisExtent: 280.0
+                              crossAxisSpacing: 15,
+                              mainAxisSpacing: 15,
+                                mainAxisExtent: 290.0
                             ),
                             itemCount: products.length,
                             itemBuilder: (context, index) {
-                              return Container(
-                                width: 150,
-                                height: 200,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      spreadRadius: 3,
-                                      blurRadius: 5,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(10),
-                                          child: Image.network(
-                                            products[index].image,
-                                            width: double.infinity,
-                                            height: 200,
-                                            fit: BoxFit.cover,
+                              return Padding(
+                                padding: EdgeInsets.only(left: 5),
+                                child: Container(
+                                  width: 150,
+                                  height: 200,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        spreadRadius: 3,
+                                        blurRadius: 5,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Image.network(
+                                              products[index].image,
+                                              width: double.infinity,
+                                              height: 200,
+                                              fit: BoxFit.cover,
 
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 8, left: 6),
+                                        child: Text(
+                                          products[index].title,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10, bottom: 5, left: 6),
+                                        child: Text(
+                                          "${products[index].price} ₺",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8, left: 6),
-                                      child: Text(
-                                        products[index].title,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(fontSize: 15),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10, bottom: 5, left: 6),
-                                      child: Text(
-                                        "${products[index].price} ₺",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               );
                             },
@@ -244,14 +311,16 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                         ],
                       );
                     } else {
-                      return Text('Henüz ürün eklenmemiş.');
+                      return Column(
+                        children: [
+                          SizedBox(height: 100,),
+                          Text('Henüz ürün eklenmemiş.'),
+                        ],
+                      );
                     }
                   }
                 },
               ),
-
-
-
 
             ],
           ),

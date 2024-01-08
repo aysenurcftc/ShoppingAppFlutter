@@ -6,6 +6,7 @@ import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/ui/bottomnav-screen.dart';
 import 'package:senior_project/ui/login/forgotpass-screen.dart';
 import 'package:senior_project/ui/login/register-screen.dart';
+import 'package:senior_project/utils/utils.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -19,6 +20,8 @@ class _LoginScreenState extends State<LoginScreen> {
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
 
+  bool _isLoading = false;
+
 
 
   var obscureText = true;
@@ -27,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   AuthService authservice = AuthService();
 
 
+  /*
   Future<void> signInWithEmailAndPassword() async {
     try {
       authservice.signIn(
@@ -44,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       });
     }
-  }
+  }*/
 
   Future<void> signInWithGoogle() async {
     try {
@@ -64,6 +68,23 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
     emailController.dispose();
     passwordController.dispose();
+
+  }
+
+
+  void loginUser() async{
+    setState(() {
+      _isLoading = true;
+    });
+    String res = await AuthService().loginUser(email: emailController.text, password: passwordController.text);
+    if(res == 'success'){
+      Navigator.of(context as BuildContext).pushReplacement(MaterialPageRoute(builder: (context) => Home()));
+    }else{
+      showSnackBar(context as BuildContext, res);
+    }
+    setState(() {
+      _isLoading = false;
+    });
 
   }
 
@@ -184,9 +205,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                               onPressed: (){
-                                signInWithEmailAndPassword();
+                                loginUser();
                               },
-                              child: const Text("Giriş Yap",
+                              child: _isLoading ? Center(child: CircularProgressIndicator(color: Colors.black,),) : const Text("Giriş Yap",
                               style: TextStyle(
                                 color: Colors.black,
                               ),

@@ -3,10 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/ui/bottomnav-screen.dart';
 import 'package:senior_project/ui/login/login-screen.dart';
-import 'package:senior_project/utils/basket_provider.dart';
-import 'package:senior_project/utils/user_provider.dart';
+import 'package:senior_project/providers/basket_provider.dart';
+
 
 
 

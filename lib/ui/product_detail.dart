@@ -4,7 +4,7 @@ import 'package:senior_project/models/basket_product.dart';
 import 'package:senior_project/models/products.dart';
 import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/shopping_basket_screen.dart';
-import 'package:senior_project/utils/basket_provider.dart';
+import 'package:senior_project/providers/basket_provider.dart';
 
 
 class ProductDetailScreen extends StatefulWidget {

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/ui/profile-detail-screen.dart';
 import 'package:senior_project/ui/user_settings.dart';
-import 'package:senior_project/utils/user_provider.dart';
+
 
 class ProfileScreen extends StatefulWidget {
 
@@ -14,21 +15,22 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController _searchController = TextEditingController();
 
+
   void _startSearch() {
     String query = _searchController.text;
   }
 
   AuthService authService = AuthService();
   late Future<String?> username;
+  late Future<String?> uid;
 
 
   @override
   void initState() {
     super.initState();
     username = authService.getCurrentUsername();
+
   }
-
-
 
 
   @override
