@@ -72,7 +72,7 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
           'userName': usernameController.text,
           // 'email' alanını güncellemiyoruz, çünkü bu alan değiştirilemez (enabled: false)
         });
-        Provider.of<UserProvider>(context, listen: false).updateUser(usernameController.text);
+        //Provider.of<UserProvider>(context, listen: false).updateUser(usernameController.text);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

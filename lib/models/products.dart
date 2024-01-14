@@ -11,6 +11,7 @@ class Product {
   late String uid;
   late String image;
   late DateTime timestamp;
+  final likes;
 
 
   // Constructor
@@ -24,12 +25,44 @@ class Product {
     required this.uid,
     required this.image,
     required this.timestamp,
-
-
+    required this.likes,
   });
 
+  static Product fromSnap(DocumentSnapshot snap) {
+    var snapshot = snap.data() as Map<String, dynamic>;
+    return Product(
+        title : snapshot['title'],
+        description: snapshot["description"],
+        price : snapshot['price'],
+        category : snapshot['category'],
+        condition : snapshot['condition'],
+        size : snapshot['size'],
+        uid: snapshot["uid"],
+        image : snapshot['image'],
+        timestamp: (snapshot['timestamp'] as Timestamp).toDate(),
+        likes: snapshot["likes"],
 
+    );
+  }
+
+
+  Map<String, dynamic> toJson() => {
+    "title": title,
+    "description": description,
+    "price": price,
+    "category": category,
+    "condition": condition,
+    "size": size,
+    'uid': uid,
+    'image': image,
+    'timestamp' : timestamp,
+    'likes' : likes,
+  };
+
+
+  /*
   Product.fromMap(Map<String, dynamic> data) {
+
     title = data['title'] ?? '';
     description = data['description'] ?? '';
     price = data['price'] ?? '';
@@ -40,5 +73,8 @@ class Product {
     image = data['image'] ?? '';
     timestamp = (data['timestamp'] as Timestamp).toDate();
 
-  }
+  }*/
+
+
+
 }

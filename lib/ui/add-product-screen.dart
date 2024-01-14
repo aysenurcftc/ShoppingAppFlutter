@@ -28,7 +28,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Uint8List? files;
 
 
-  FirestoreService firestoreService = FirestoreService();
+  ProductService firestoreService = ProductService();
 
 
 

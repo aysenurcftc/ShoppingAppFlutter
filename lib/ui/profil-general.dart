@@ -1,92 +1,52 @@
 
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project/models/products.dart';
+import 'package:senior_project/models/users.dart';
 import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/auth.dart';
-import 'package:flutter/material.dart';
-import 'package:senior_project/models/products.dart';
 import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/user_settings.dart';
-import 'package:senior_project/utils/utils.dart';
-
-
 
 class ProfileGeneral extends StatefulWidget {
-
-
-
 
   @override
   State<ProfileGeneral> createState() => _ProfileGeneralState();
 }
 
+
+
 class _ProfileGeneralState extends State<ProfileGeneral> {
 
   final AuthService authService = AuthService();
-  final FirestoreService firestoreService = FirestoreService();
+  final ProductService firestoreService = ProductService();
   late Future<List<Product>> userProducts;
   late Future<String?> username;
 
-  late String? uid;
 
+  late String? uid;
   var userData = {};
   int followers = 0;
   int following = 0;
   bool isFollowing = false;
   bool isLoading = false;
+  late UserProvider userProvider;
 
 
   @override
-  void initState() {
+  void initState()  {
     super.initState();
     userProducts =  firestoreService.getUserProducts();
     username = authService.getCurrentUsername();
-    fetchData();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.fetchUser();
+     fetchData();
   }
+
 
   Future<void> fetchData() async {
     uid = await authService.getCurrentUserId();
-    getData(uid!);
   }
-
-  getData(String userId) async {
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      var userSnap = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-
-      // Kullanıcının takipçi ve takip ettikleri sayısını al
-      followers = userSnap.data()!['followers'].length;
-      following = userSnap.data()!['following'].length;
-
-      // Kullanıcı takip ediliyor mu kontrol et
-      isFollowing = userSnap
-          .data()!['followers']
-          .contains(FirebaseAuth.instance.currentUser!.uid);
-
-      // Kullanıcı bilgilerini güncelle
-      userData = userSnap.data()!;
-      setState(() {});
-    } catch (e) {
-      showSnackBar(
-        context,
-        e.toString(),
-      );
-    }
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-
-
-
 
 
   @override
@@ -96,7 +56,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
     final double height = screenSize.size.height;
     final double width = screenSize.size.width;
 
-    return isLoading
+      return isLoading
         ? const Center(
         child: CircularProgressIndicator(),
         )
@@ -105,7 +65,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
         children: [
         Container(
         color: Colors.white,
-        height: 180,
+        height: 200,
         width: width,
         child: Row(
           children: [
@@ -113,25 +73,36 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 20,top: 8,bottom: 5),
-                  child: Image.asset("img/profile.jpg",
-                    width: 80,
-                    height: 80,
+                  padding: const EdgeInsets.only(
+                      left: 20, top: 8, bottom: 5),
+                  child: Consumer<UserProvider>(
+                    builder: (context, value,child) {
+                      return Container(
+                        width: 100,
+                        height: 100,
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            value.getUser?.photoUrl ?? "https://i.pinimg.com/736x/8b/25/91/8b259121597545e2739974384c18a8e6.jpg",
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
+
                 Padding(
-                  padding:  EdgeInsets.only(left: 35),
+                  padding:  EdgeInsets.only(left: 50,top: 8),
                   child:  Consumer<UserProvider>(
                     builder: (BuildContext context, UserProvider value, Widget? child) {
                       return Text(
-                        value.username ?? 'KullanıcıAdı',
+                        value.getUser?.name ?? "Kullanıcı",
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
                       );
-                  },
+                    },
                   ),
                 ),
 
@@ -144,7 +115,8 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                       child: Text("Takip",
                       style: TextStyle(
                         color: Colors.white,
-                      ),),
+                      ),
+                      ),
                   ),
                 )
               ],
@@ -330,5 +302,6 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
         ]
       ),
     );
-  }
+    }
+
 }

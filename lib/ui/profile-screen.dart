@@ -23,12 +23,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   AuthService authService = AuthService();
   late Future<String?> username;
   late Future<String?> uid;
-
+  late UserProvider userProvider;
 
   @override
   void initState() {
     super.initState();
     username = authService.getCurrentUsername();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.fetchUser();
 
   }
 
@@ -45,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Container(
               color: Colors.white,
-              height: 120,
+              height: 150,
               width: width,
               child: Row(
                 children: [
@@ -54,17 +56,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(left: 20,top: 8,bottom: 5),
-                        child: Image.asset("img/profile.jpg",
-                          width: 80,
-                          height: 80,
+                        child: Consumer<UserProvider>(
+                          builder: (context, value, widget) {
+                            return Container(
+                              width: 100,
+                              height: 100,
+                              child: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  value.getUser?.photoUrl ?? "https://i.pinimg.com/736x/8b/25/91/8b259121597545e2739974384c18a8e6.jpg",
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
+
                       Padding(
-                        padding: const EdgeInsets.only(left: 20),
+                        padding: const EdgeInsets.only(left: 50, top: 8),
                         child: Consumer<UserProvider>(
                           builder: (BuildContext context, UserProvider value, Widget? child) {
                             return Text(
-                              value.username ?? 'KullanıcıAdı',
+                              value.getUser?.name ?? "Kullanıcı",
                               style: TextStyle(
                                 color: Colors.grey.shade600,
                                 fontWeight: FontWeight.bold,

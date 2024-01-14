@@ -63,7 +63,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       name: nameController.text,
         email: emailController.text,
         password: passwordController.text,
-        userName: userNameController.text,
+        username: userNameController.text,
         surname: surnameController.text,
         file: _image!);
     // if string returned is sucess, user has been created

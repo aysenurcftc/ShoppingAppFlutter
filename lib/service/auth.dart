@@ -9,8 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:senior_project/models/users.dart';
 import 'package:senior_project/resources/storage_methods.dart';
-import 'package:senior_project/ui/bottomnav-screen.dart';
+import 'package:senior_project/models/users.dart' as model;
 import 'package:senior_project/ui/login/login-screen.dart';
 
 
@@ -29,6 +30,7 @@ class AuthService {
         return user.uid;
       } else {
         // Kullanıcı oturum açmamışsa null dönebilirsiniz.
+        print("oturuöööö");
         return null;
       }
     } catch (e) {
@@ -171,7 +173,7 @@ class AuthService {
   Future<String> signupUser ({
     required String name,
     required String surname,
-    required String userName,
+    required String username,
     required String email,
     required String password,
     required Uint8List file,
@@ -185,7 +187,7 @@ class AuthService {
         await Firebase.initializeApp();
       }
 
-      if(email.isNotEmpty || password.isNotEmpty || userName.isNotEmpty || name.isNotEmpty || surname.isNotEmpty || file != null){
+      if(email.isNotEmpty || password.isNotEmpty || username.isNotEmpty || name.isNotEmpty || surname.isNotEmpty || file != null){
 
         //register user
         UserCredential cred = await auth.createUserWithEmailAndPassword(email: email, password: password);
@@ -194,16 +196,19 @@ class AuthService {
         String photoUrl = await StorageMethods().uploadImageToStorage("profilePics", file, false);
 
         //add user to database
-        await _firestore.collection("users").doc(cred.user!.uid).set({
-          'name' : name,
-          'surname' : surname,
-          'username' : userName,
-          'uid' : cred.user!.uid,
-          'email' : email,
-          'followers' : [],
-          'following' : [],
-          'photoUrl' : photoUrl,
-        });
+
+        model.Users user = model.Users(
+          username: username,
+          uid: cred.user!.uid,
+          photoUrl: photoUrl,
+          email: email,
+          name: name,
+          surname: surname,
+          followers: [],
+          following: [],
+        );
+
+        await _firestore.collection("users").doc(cred.user!.uid).set(user.toJson());
 
         res = "success";
       }
@@ -244,6 +249,15 @@ class AuthService {
   }
 
 
+  // get user details
+  Future<model.Users> getUserDetails() async {
+    User currentUser = auth.currentUser!;
+
+    DocumentSnapshot documentSnapshot =
+    await _firestore.collection('users').doc(currentUser.uid).get();
+
+    return model.Users.fromSnap(documentSnapshot);
+  }
 
 
 

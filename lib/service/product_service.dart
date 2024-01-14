@@ -3,16 +3,52 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:senior_project/models/products.dart';
+import 'package:senior_project/models/users.dart' as model;
 import 'package:senior_project/service/auth.dart';
 
 
-class FirestoreService {
+
+
+class ProductService {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   AuthService auth = AuthService();
 
-  
+
+
+// get user details
+  Future<model.Users> getUserDetails() async {
+    User currentUser = _auth.currentUser!;
+
+    DocumentSnapshot documentSnapshot =
+    await _firestore.collection('users').doc(currentUser.uid).get();
+
+    return model.Users.fromSnap(documentSnapshot);
+  }
+
+
+  Future<model.Users> getUserData() async {
+    try {
+      User currentUser = _auth.currentUser!;
+      DocumentSnapshot documentSnapshot =
+      await _firestore.collection('users').doc(currentUser.uid).get();
+
+      return model.Users.fromSnap(documentSnapshot);
+    } catch (e) {
+      print('Error fetching user data: $e');
+      // Handle the error as needed
+      throw e;
+    }
+  }
+
+// Add other authentication-related methods if needed
+
+
+
   Future<String> uploadImageToStorage(String childName, Uint8List file) async {
     try {
       String uniqueImageName = '${DateTime.now().millisecondsSinceEpoch}_${_auth.currentUser!.uid}.jpg';
@@ -81,7 +117,7 @@ class FirestoreService {
         QuerySnapshot querySnapshot = await productsCollection.get();
 
         List<Product> userProducts = querySnapshot.docs
-            .map((doc) => Product.fromMap(doc.data() as Map<String, dynamic>))
+            .map((doc) => Product.fromSnap(doc))
             .toList();
 
         return userProducts;
@@ -95,26 +131,23 @@ class FirestoreService {
   }
 
   Future<List<Product>> getAllUsersProducts() async {
-
     try {
       CollectionReference usersCollection = FirebaseFirestore.instance.collection('users');
       QuerySnapshot usersSnapshot = await usersCollection.get();
       List<Product> allUsersProducts = [];
 
       for (QueryDocumentSnapshot userDoc in usersSnapshot.docs) {
-
         String userId = userDoc.id;
         CollectionReference productsCollection = usersCollection.doc(userId).collection('products');
         QuerySnapshot productsSnapshot = await productsCollection.get();
 
         List<Product> userProducts = productsSnapshot.docs
-            .map((doc) => Product.fromMap(doc.data() as Map<String, dynamic>))
+            .map((doc) => Product.fromSnap(doc))
             .toList();
         allUsersProducts.addAll(userProducts);
       }
 
       return allUsersProducts;
-
     } catch (e) {
       print('Ürünleri çekerken bir hata oluştu: $e');
       return [];

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class BottomNavigationBarWidget extends StatelessWidget {
+class BottomNavigationBarWidget extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTap;
 
@@ -9,13 +9,44 @@ class BottomNavigationBarWidget extends StatelessWidget {
     required this.onTap,
   });
 
+  @override
+  State<BottomNavigationBarWidget> createState() => _BottomNavigationBarWidgetState();
+}
 
+class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
+
+  int _page = 0;
+  late PageController pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    pageController.dispose();
+  }
+
+  void onPageChanged(int page) {
+    setState(() {
+      _page = page;
+    });
+  }
+  void navigationTapped(int page) {
+    //Animating Page
+    pageController.jumpToPage(page);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: onTap,
+    return
+
+      BottomNavigationBar(
+      currentIndex: widget.currentIndex,
+      onTap: widget.onTap,
       showSelectedLabels: true,
       showUnselectedLabels: true,
 

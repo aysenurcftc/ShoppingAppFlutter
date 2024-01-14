@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   final AuthService authService = AuthService();
-  final FirestoreService firestoreService = FirestoreService();
+  final ProductService firestoreService = ProductService();
   late Future<List<Product>> userProducts;
   late Future<String?> username;
 

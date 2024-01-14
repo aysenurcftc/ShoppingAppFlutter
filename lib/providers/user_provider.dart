@@ -1,42 +1,50 @@
+
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:senior_project/models/users.dart';
+import 'package:senior_project/service/product_service.dart';
 
-class UserProvider with ChangeNotifier {
-  FirebaseAuth auth = FirebaseAuth.instance;
-  String _username = "Kullanıcı Adı";
 
-  String get username => _username;
 
-  UserProvider() {
-    // Başlangıçta kullanıcı adını Firebase'den al
-    _initializeUsername();
-  }
+class  UserProvider with ChangeNotifier {
 
-  Future<void> _initializeUsername() async {
-    await getUserName();
-    notifyListeners();
-  }
 
-  Future<void> getUserName() async {
-    User? user = auth.currentUser;
+  Users _user = const Users(
+    username: 'null',
+    uid: 'null',
+    email: 'null',
+    photoUrl: 'null',
+    name: 'null',
+    surname: 'null',
+    followers: [],
+    following: [],
+  );
 
-    if (user != null) {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .get();
+  //Users? _user;
 
-      Map<String, dynamic>? userData = userSnapshot.data() as Map<String, dynamic>?;
+  ProductService _authMethods = ProductService();
 
-      if (userData != null) {
-        _username = userData['userName'] ?? '';
+  Users get getUser => _user;
+
+  Future<void> fetchUser() async {
+    try {
+      var userData = await _authMethods.getUserData();
+
+      if (userData is Users) {
+        _user = userData;
+      } else {
+        print("getUserData metodundan beklenen tür Users değil. Alınan tür: ${userData.runtimeType}");
       }
+
+      notifyListeners();
+    } catch (e) {
+      print("Error fetching user data: $e");
     }
   }
 
-  void updateUser(String newUsername) {
-    _username = newUsername;
-    notifyListeners();
-  }
+
+
+
 }
