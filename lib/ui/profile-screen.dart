@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/auth.dart';
+import 'package:senior_project/ui/myWallet.dart';
+import 'package:senior_project/ui/my_coupon.dart';
+import 'package:senior_project/ui/my_orders.dart';
 import 'package:senior_project/ui/profile-detail-screen.dart';
 import 'package:senior_project/ui/user_settings.dart';
 
@@ -151,40 +154,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
               
-                    Container(
-                      color: Colors.white,
-                      width: width,
-                      child: ListTile(
-                        leading: Icon(Icons.shopping_bag_outlined),
-                        title: Row(
-                          children: [
-                            Text("Siparişlerim",
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                              ),),
-                            Spacer(),
-                            Icon(Icons.arrow_forward_ios,
-                              color: Colors.grey.shade600,),
-                          ],
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) =>  MyOrdersScreen()),
+                        );
+                      },
+                      child: Container(
+                        color: Colors.white,
+                        width: width,
+                        child: ListTile(
+                          leading: Icon(Icons.shopping_bag_outlined),
+                          title: Row(
+                            children: [
+                              Text("Siparişlerim",
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                ),),
+                              Spacer(),
+                              Icon(Icons.arrow_forward_ios,
+                                color: Colors.grey.shade600,),
+                            ],
+                          ),
                         ),
                       ),
                     ),
               
-                    Container(
-                      color: Colors.white,
-                      width: width,
-                      child: ListTile(
-                        leading: Icon(Icons.discount_outlined),
-                        title: Row(
-                          children: [
-                            Text("Kuponlarım",
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                              ),),
-                            Spacer(),
-                            Icon(Icons.arrow_forward_ios,
-                              color: Colors.grey.shade600,),
-                          ],
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) =>  myCouponScreen()),
+                        );
+                      },
+                      child: Container(
+                        color: Colors.white,
+                        width: width,
+                        child: ListTile(
+                          leading: Icon(Icons.discount_outlined),
+                          title: Row(
+                            children: [
+                              Text("Kuponlarım",
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                ),),
+                              Spacer(),
+                              Icon(Icons.arrow_forward_ios,
+                                color: Colors.grey.shade600,),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -208,21 +227,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
               
-                    Container(
-                      color: Colors.white,
-                      width: width,
-                      child: ListTile(
-                        leading: Icon(Icons.wallet),
-                        title: Row(
-                          children: [
-                            Text("Cüzdanım",
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                              ),),
-                            Spacer(),
-                            Icon(Icons.arrow_forward_ios,
-                              color: Colors.grey.shade600,),
-                          ],
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => myWalletScreen()),
+                        );
+                      },
+                      child: Container(
+                        color: Colors.white,
+                        width: width,
+                        child: ListTile(
+                          leading: Icon(Icons.wallet),
+                          title: Row(
+                            children: [
+                              Text("Cüzdanım",
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                ),),
+                              Spacer(),
+                              Icon(Icons.arrow_forward_ios,
+                                color: Colors.grey.shade600,),
+                            ],
+                          ),
                         ),
                       ),
                     ),

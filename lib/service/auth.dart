@@ -9,14 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:senior_project/models/users.dart';
 import 'package:senior_project/resources/storage_methods.dart';
 import 'package:senior_project/models/users.dart' as model;
 import 'package:senior_project/ui/login/login-screen.dart';
 
+import '../models/wallet.dart';
+
 
 
 class AuthService {
+  
   final userCollection = FirebaseFirestore.instance.collection("users");
 
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -210,6 +212,16 @@ class AuthService {
 
         await _firestore.collection("users").doc(cred.user!.uid).set(user.toJson());
 
+
+        Wallet userWallet = Wallet(
+          uid: cred.user!.uid,
+          price: "100000", // Initial wallet balance set to 1000, modify as needed
+          timestamp: DateTime.now(),
+        );
+
+        // Add the Wallet to the 'wallets' collection
+        await _firestore.collection("wallets").doc(cred.user!.uid).set(userWallet.toJson());
+
         res = "success";
       }
     }
@@ -259,6 +271,18 @@ class AuthService {
     return model.Users.fromSnap(documentSnapshot);
   }
 
+
+  Future<Wallet> getWallet(String userId) async {
+    DocumentSnapshot walletSnapshot =
+    await _firestore.collection("wallets").doc(userId).get();
+
+    return Wallet.fromSnap(walletSnapshot);
+  }
+
+  Future<void> updateWalletBalance(String userId, String newBalance) async {
+    // Update the 'price' field in the 'wallets' collection
+    await _firestore.collection("wallets").doc(userId).update({"price": newBalance});
+  }
 
 
 

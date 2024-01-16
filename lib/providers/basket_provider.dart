@@ -17,6 +17,10 @@ class BasketProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearBasket() {
+    _basketItems.clear();
+    notifyListeners();
+  }
 
 
 

@@ -4,7 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project/providers/product_provider.dart';
+import 'package:senior_project/providers/purchased_provider.dart';
 import 'package:senior_project/providers/user_provider.dart';
+import 'package:senior_project/providers/wallet_provider.dart';
 import 'package:senior_project/ui/bottomnav-screen.dart';
 import 'package:senior_project/ui/login/login-screen.dart';
 import 'package:senior_project/providers/basket_provider.dart';
@@ -26,9 +28,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+
+
         ChangeNotifierProvider<UserProvider>(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => BasketProvider()),
         ChangeNotifierProvider(create: (context) => ProductProvider()),
+        ChangeNotifierProvider(create: (context) => WalletProvider()),
+        ChangeNotifierProvider(create: (context) => PurchasedItemsProvider()),
+
 
 
       ],

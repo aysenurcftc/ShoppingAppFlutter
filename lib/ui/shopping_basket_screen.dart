@@ -1,7 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senior_project/models/purchased.dart';
 import 'package:senior_project/providers/basket_provider.dart';
+import 'package:senior_project/providers/purchased_provider.dart';
+import 'package:senior_project/providers/wallet_provider.dart';
+import 'package:senior_project/service/auth.dart';
 
 class ShoppingBasketScreen extends StatefulWidget {
 
@@ -12,19 +16,85 @@ class ShoppingBasketScreen extends StatefulWidget {
 
 class _ShoppingBasketScreenState extends State<ShoppingBasketScreen> {
 
-
+  final AuthService authService = AuthService();
   int _selectedIndex = 0;
   bool deleteItem = false;
 
   var toplam = 0.0;
 
+  late String? userId;
+
+
+  Future<void> fetchData() async {
+    userId = await authService.getCurrentUserId();
+  }
+
+  late WalletProvider walletProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    walletProvider = Provider.of<WalletProvider>(context, listen: false);
+    walletProvider.getWalletData();
+    fetchData();
+  }
+
+
+  Future<void> _onItemTapped(int index) async {
 
 
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 1) {
+      double basketTotal = toplam;
+
+      // WalletProvider'ı al
+      WalletProvider walletProvider =
+      Provider.of<WalletProvider>(context, listen: false);
+      double currentBalance = double.parse(walletProvider.wallet?.price ?? "0");
+
+
+      if (currentBalance >= basketTotal) {
+        await walletProvider.updateWalletBalance(
+            (currentBalance - basketTotal).toString());
+
+
+        // Satın alınan ürünleri PurchasedItemsProvider'a ekle
+        Provider.of<BasketProvider>(context, listen: false)
+            .basketItems
+            .forEach((basketItem) {
+          // Sepet ürününden gerekli bilgileri al
+          PurchasedItem purchasedItem = PurchasedItem(
+            title: basketItem.title,
+            category: basketItem.category,
+            price: double.parse(basketItem.price),
+            image: basketItem.image,
+          );
+
+          Provider.of<PurchasedItemsProvider>(context, listen: false).addPurchasedItem(purchasedItem, userId!);
+        });
+
+
+        Provider.of<BasketProvider>(context, listen: false).clearBasket();
+
+        // Snackbar veya Toast mesajı göster
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Sepet onaylandı"),
+          ),
+        );
+      } else {
+        // Cüzdan bakiyesi yetersizse uyarı göster
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Yetersiz bakiye!"),
+          ),
+        );
+      }
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override

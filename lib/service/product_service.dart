@@ -20,6 +20,23 @@ class ProductService {
 
 
 
+  Future<void> addOrder(String userId, Map<String, dynamic> order) async {
+    try {
+      await _firestore.collection('users').doc(userId).collection('orders').add(order);
+    } catch (e) {
+      print('Hata oluştu: $e');
+    }
+  }
+
+  Stream<QuerySnapshot> getOrdersStream(String userId) {
+    try {
+      return _firestore.collection('users').doc(userId).collection('orders').snapshots();
+    } catch (e) {
+      print('Hata oluştu: $e');
+      throw e;
+    }
+  }
+
 // get user details
   Future<model.Users> getUserDetails() async {
     User currentUser = _auth.currentUser!;

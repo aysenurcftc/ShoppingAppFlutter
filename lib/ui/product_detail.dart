@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project/models/basket_product.dart';
-import 'package:senior_project/models/products.dart';
-import 'package:senior_project/providers/product_provider.dart';
 import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/product_service.dart';
+import 'package:senior_project/ui/create_coupon.dart';
 import 'package:senior_project/ui/shopping_basket_screen.dart';
 import 'package:senior_project/providers/basket_provider.dart';
 import 'package:senior_project/widgets/like_animation.dart';
@@ -239,20 +238,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),),
             ),
 
-            Container(
-              width: width,
-                height: 80,
-                color: Colors.white,
-                child: Padding(
-                  padding:  EdgeInsets.only(left: 18,right: 18,top: 10,bottom: 10),
-                  child: Text("Kuponlar&Kampanyalar",style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreateCouponScreen()),
+                );
+              },
+              child: Container(
+                width: width,
+                  height: 80,
+                  color: Colors.white,
+                  child: Padding(
+                    padding:  EdgeInsets.only(left: 18,right: 18,top: 10,bottom: 10),
+                    child: Text("Kuponlar&Kampanyalar",style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
 
-                  ),
+                    ),
 
+                    ),
                   ),
-                ),
+              ),
             ),
 
             Padding(

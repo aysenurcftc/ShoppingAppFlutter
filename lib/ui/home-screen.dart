@@ -7,6 +7,7 @@ import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/add-product-screen.dart';
+import 'package:senior_project/ui/create_coupon.dart';
 import 'package:senior_project/ui/new_products_screen.dart';
 import 'package:senior_project/ui/product_detail.dart';
 
@@ -365,32 +366,40 @@ class _HomeScreenState extends State<HomeScreen> {
 
             Padding(
               padding: const EdgeInsets.only(top: 20,bottom: 15),
-              child: Container(
-                width: 340,
-                height: 60,
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFFF3E9E0), Colors.white], // İstediğiniz renkleri buraya ekleyebilirsiniz
-                    ),
-                  borderRadius: BorderRadius.circular(15), // Yarı çapı kadar oval bir container yapar
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 3,
-                      blurRadius: 5,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    "Kupon Oluştur",
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.bold,
+              child: GestureDetector(
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CreateCouponScreen()),
+                  );
+                },
+                child: Container(
+                  width: 340,
+                  height: 60,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFFF3E9E0), Colors.white], // İstediğiniz renkleri buraya ekleyebilirsiniz
+                      ),
+                    borderRadius: BorderRadius.circular(15), // Yarı çapı kadar oval bir container yapar
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 3,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      "Kupon Oluştur",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
