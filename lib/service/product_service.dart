@@ -85,8 +85,7 @@ class ProductService {
         CollectionReference userProductsCollection =
         userDocRef.collection('products');
 
-        // Add product to the user's products collection
-        DocumentReference productDocRef = await userProductsCollection.add({
+        await userProductsCollection.doc(uid).set({
           'title': title,
           'description': description,
           'price': price,
@@ -96,10 +95,11 @@ class ProductService {
           'image': imageUrl,
           'uid': uid,
           'timestamp': FieldValue.serverTimestamp(),
-          'likedBy': [],
+          'likes': [],
         });
 
-        print('Ürün başarıyla eklendi. Product ID: ${productDocRef.id}');
+
+        print('Ürün başarıyla eklendi. Product ID:');
       }
     } catch (e) {
       print('Ürün eklenirken bir hata oluştu: $e');
@@ -155,6 +155,7 @@ class ProductService {
   }
 
 
+  /*
   Future<void> likeProduct(String productIdentifier, bool isLiked) async {
     try {
       String? userId = await auth.getCurrentUserId();
@@ -195,12 +196,89 @@ class ProductService {
     } catch (e) {
       print('Ürünü beğenirken bir hata oluştu: $e');
     }
+  }*/
+
+  Stream<List<Product>> streamAllUsersProducts() {
+    return _firestore.collection('users').snapshots().asyncMap(
+          (snapshot) async {
+        List<Product> allUsersProducts = [];
+
+        for (QueryDocumentSnapshot userDoc in snapshot.docs) {
+          String userId = userDoc.id;
+          CollectionReference productsCollection = _firestore.collection('users').doc(userId).collection('products');
+
+          // Use `await` here to get the products snapshot
+          QuerySnapshot productsSnapshot = await productsCollection.get();
+
+          List<Product> userProducts = productsSnapshot.docs
+              .map((doc) => Product.fromSnap(doc))
+              .toList();
+          allUsersProducts.addAll(userProducts);
+        }
+
+        return allUsersProducts;
+      },
+    );
   }
 
 
 
 
 
+  Future<String> likePost(String productId, String uid, List likes) async {
+    String res = "Some error occurred";
+
+    try {
+      if (likes.contains(uid)) {
+        _firestore.collection('users').doc(uid).collection('products').doc(productId).update({
+          'likes': FieldValue.arrayRemove([uid])
+        });
+      } else {
+        // else we need to add uid to the likes array
+        _firestore.collection('users').doc(uid).collection('products').doc(productId).update({
+          'likes': FieldValue.arrayUnion([uid])
+        });
+      }
+      res = 'success';
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
+
+
+  /*
+
+  Future<void> likePost(String productId, String userId, List<dynamic> currentLikes) async {
+
+    String? userId = await auth.getCurrentUserId();
+
+    try {
+
+      DocumentReference productRef = _firestore.collection('users').doc(userId).collection('products').doc(productId);
+
+      // Convert currentLikes to List<String>
+      List<String> likes = currentLikes.map((like) => like.toString()).toList();
+
+      // Check if the user has already liked the product
+      if (likes.contains(userId)) {
+        // If the user has already liked, remove the like
+        likes.remove(userId);
+      } else {
+        // If the user has not liked, add the like
+        likes.add(userId!);
+      }
+
+      // Update the likes in Firestore
+      await productRef.update({'likes': likes});
+    } catch (e) {
+      print('Error updating likes: $e');
+      // Print additional information about the document
+      print('Document Path: users/$userId/products/$productId');
+    }
+  }
+  */
 
 
 
@@ -208,9 +286,7 @@ class ProductService {
 
 
 
-
-
-}
+ }
 
 
 

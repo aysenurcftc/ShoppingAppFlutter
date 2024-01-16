@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project/models/basket_product.dart';
 import 'package:senior_project/models/products.dart';
+import 'package:senior_project/providers/product_provider.dart';
 import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/shopping_basket_screen.dart';
 import 'package:senior_project/providers/basket_provider.dart';
+import 'package:senior_project/widgets/like_animation.dart';
 
 
 class ProductDetailScreen extends StatefulWidget {
@@ -18,9 +20,10 @@ class ProductDetailScreen extends StatefulWidget {
   final String category;
   final String size;
   final String uid;
+  final likes;
 
   ProductDetailScreen(this.image, this.productTitle, this.productPrice, this.description,this.condition,
-      this.category, this.size, this.uid);
+      this.category, this.size, this.uid, this.likes);
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -29,17 +32,28 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final ProductService firestoreService = ProductService();
 
+  late UserProvider userProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.fetchUser();
+
+    isLiked = widget.likes.contains(userProvider.getUser.uid);
+  }
+
+  bool isLikeAnimating = false;
+  bool isLiked = false;
+
 
   @override
   Widget build(BuildContext context) {
 
 
-
-
     var screenSize = MediaQuery.of(context);
     final double height = screenSize.size.height;
     final double width = screenSize.size.width;
-
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -111,18 +125,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         color: Colors.white,
                       ),
                       padding: EdgeInsets.all(2),
-                      child: IconButton(
-                        icon: Icon(
-                  Icons.favorite_border
+                      child: LikeAnimation(
+                        isAnimating: widget.likes.contains(userProvider.getUser.uid),
+                        smallLike: false,
+                        child: IconButton(
+                          icon: isLiked ?
+                        const Icon(Icons.favorite,color: Colors.red,) :
+                        const Icon(Icons.favorite_border),
+                          color: Colors.pink.shade400,
+                          iconSize: 20,
+                          onPressed: () async {
+                            await ProductService().likePost(
+                              widget.uid,
+                              userProvider.getUser.uid,
+                              widget.likes,
+                            );
+                            setState(() {
+                              isLiked = !isLiked;
+
+                            });
+                          }
                         ),
-                        color: Colors.pink.shade400,
-                        iconSize: 30,
-                        onPressed: () async {
-                          setState(() {
-
-                          });
-
-                        },
                       ),
                     ),
                   ),

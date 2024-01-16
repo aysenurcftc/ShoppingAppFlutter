@@ -1,10 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:senior_project/models/products.dart';
+import 'package:senior_project/providers/product_provider.dart';
+import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/add-product-screen.dart';
 import 'package:senior_project/ui/new_products_screen.dart';
 import 'package:senior_project/ui/product_detail.dart';
+
+import '../models/users.dart';
+import '../widgets/like_animation.dart';
 
 
 
@@ -27,8 +34,17 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<String?> username;
 
 
-  Set<int> liked = Set<int>();
 
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Set<int> liked = Set<int>();
+  late ProductProvider _productProvider;
+
+
+
+  late var userData;
+  late UserProvider userProvider;
 
 
   @override
@@ -36,8 +52,23 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     userProducts = firestoreService.getAllUsersProducts();
     username = authService.getCurrentUsername();
+    getUserData();
+    _productProvider = Provider.of<ProductProvider>(context, listen: false);
+    _productProvider.fetchProducts();
+
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.fetchUser();
 
   }
+
+
+  Future<void> getUserData() async {
+
+    userData = await firestoreService.getUserData();
+    print(userData.uid);
+  }
+
+  bool isLikeAnimating = false;
 
   Color myColor = Color(0xFFF3E9E0);
 
@@ -46,6 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
     var screenSize = MediaQuery.of(context);
     final double height = screenSize.size.height;
     final double width = screenSize.size.width;
+
+    //final Users user = Provider.of<UserProvider>(context).getUser;
 
 
     return Scaffold(
@@ -64,7 +97,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Positioned(
                   bottom: 20,
-                  // Container'ı resmin üzerinde yukarı doğru kaydırarak görünmesini sağlar
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20, right: 20),
                     child: Container(
@@ -72,9 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 100,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        // Card'ın rengini beyaz yapar
                         borderRadius: BorderRadius.circular(12.0),
-                        // Köşeleri oval yapar
                         boxShadow: [
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.5),
@@ -402,8 +432,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: FutureBuilder<List<Product>>(
-                future: userProducts ,
+              child: StreamBuilder<List<Product>>(
+                stream: firestoreService.streamAllUsersProducts(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
@@ -446,6 +476,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       product.condition,
                                       product.size,
                                       product.uid,
+                                      product.likes,
                                     ),
                                   ),
                                 );
@@ -455,15 +486,50 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   Stack(
                                     children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                          product.image,
-                                          width: 150,
-                                          height: 190,
-                                          fit: BoxFit.cover,
-                                        ),
+                                      Stack(
+                                        children: [
+                                          GestureDetector(
+                                            onDoubleTap: () async {
+                                              await ProductService().likePost(
+                                                product.uid,
+                                                userProvider.getUser.uid,
+                                                product.likes,
+                                              );
+                                              setState(() {
+                                                isLikeAnimating = true;
+                                              });
+                                            },
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(10),
+                                              child: Image.network(
+                                                product.image,
+                                                width: 150,
+                                                height: 190,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          AnimatedOpacity(
+                                            duration: const Duration(milliseconds: 100),
+                                            opacity: isLikeAnimating ? 1 : 0,
+                                            child: LikeAnimation(child: Padding(
+                                              padding: const EdgeInsets.only(top: 85),
+                                              child: Center(child: Icon(Icons.favorite, color: Colors.white, size:40,)),
+                                            ),
+                                          isAnimating: isLikeAnimating,
+                                          duration: const Duration(
+                                              milliseconds: 100
+                                          ),
+                                          onEnd : () {
+                                            setState(() {
+                                              isLikeAnimating = true;
+                                            });
+                                          }, smallLike: true,
+                                             ),
+                                          )
+                                          ]
                                       ),
+
                                       Positioned(
                                         top: 10,
                                         right: 10,
@@ -475,24 +541,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                             color: Colors.white,
                                           ),
                                           padding: EdgeInsets.all(1),
-                                          child: IconButton(
-                                            icon: Icon(
-                                             isLiked ? Icons.favorite : Icons.favorite_border,
-                                            ),
-                                            color: Colors.pink.shade400,
-                                            iconSize: 20,
-                                            onPressed: () async {
-                                              setState(() {
-                                                if (isLiked) {
-                                                  // If liked, remove from set
-                                                  liked.remove(index);
-                                                } else {
-                                                  // If not liked, add to set
-                                                  liked.add(index);
-                                                }
-                                              });
+                                          child: LikeAnimation(
+                                            isAnimating: product.likes.contains(userProvider.getUser.uid),
+                                            smallLike: false,
+                                            child: IconButton(
+                                              icon: product.likes.contains(userProvider.getUser.uid)  ?
+                                             const Icon(Icons.favorite,color: Colors.red,) :
+                                              const Icon(Icons.favorite_border),
+                                              color: Colors.pink.shade400,
+                                              iconSize: 20,
+                                              onPressed: () async {
+                                                await ProductService().likePost(
+                                                  product.uid,
+                                                  userProvider.getUser.uid,
+                                                  product.likes,
+                                                );
 
-                                          },
+                                                setState(() {
+                                                  isLikeAnimating = false;
+                                                });
+                                              }
+
+                                            ),
                                           ),
                                         ),
                                       ),

@@ -1,14 +1,20 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:senior_project/models/products.dart';
+import 'package:senior_project/providers/user_provider.dart';
+import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/product_detail.dart';
+import 'package:senior_project/widgets/like_animation.dart';
 
 class NewProductScreen extends StatefulWidget {
 
   final Future<List<Product>> userProducts;
 
   NewProductScreen(this.userProducts);
+
+
 
 
   @override
@@ -18,7 +24,23 @@ class NewProductScreen extends StatefulWidget {
 class _NewProductScreenState extends State<NewProductScreen> {
 
 
+
+  late UserProvider userProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.fetchUser();
+  }
+
+
+  final ProductService firestoreService = ProductService();
+
+
   bool isLiked = false;
+
+  bool isLikeAnimating = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,15 +50,15 @@ class _NewProductScreenState extends State<NewProductScreen> {
       ),
       body:   SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: FutureBuilder<List<Product>>(
-          future: widget.userProducts,
+        child:  StreamBuilder<List<Product>>(
+          stream: firestoreService.streamAllUsersProducts(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
             } else if (snapshot.hasError) {
-              return Text('Hata oluştu: ${snapshot.error}');
+              return Text('Error: ${snapshot.error}');
             } else {
-              List<Product>? products = snapshot.data;
+              List<Product> products = snapshot.data ?? [];
               if (products != null && products.isNotEmpty) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,6 +108,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                   products[index].condition,
                                   products[index].size,
                                   products[index].uid,
+                                  products[index].likes,
                                 ),
                               ),
                             );
@@ -130,17 +153,26 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                           color: Colors.white,
                                         ),
                                         padding: EdgeInsets.all(1),
-                                        child: IconButton(
-                                          icon: Icon(
-                                             isLiked  ? Icons.favorite : Icons.favorite_border,
+                                        child: LikeAnimation(
+                                          isAnimating: products[index].likes.contains(userProvider.getUser.uid),
+                                          smallLike: false,
+                                          child: IconButton(
+                                              icon: products[index].likes.contains(userProvider.getUser.uid)  ?
+                                              const Icon(Icons.favorite,color: Colors.red,) :
+                                              const Icon(Icons.favorite_border),
+                                              color: Colors.pink.shade400,
+                                              iconSize: 20,
+                                              onPressed: () async {
+                                                await ProductService().likePost(
+                                                  products[index].uid,
+                                                  userProvider.getUser.uid,
+                                                  products[index].likes,
+                                                );
+                                                setState(() {
+                                                  isLikeAnimating = false;
+                                                });
+                                              }
                                           ),
-                                          color: Colors.pink.shade400,
-                                          iconSize: 20,
-                                          onPressed: () {
-                                            setState(() {
-
-                                            });
-                                          },
                                         ),
                                       ),
                                     ),
