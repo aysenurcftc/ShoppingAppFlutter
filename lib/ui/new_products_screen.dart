@@ -115,7 +115,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                           },
                           child: Container(
                             width: 130,
-                            height: 200,
+                            height: 230,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20.0),
@@ -137,7 +137,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                       child: Image.network(
                                         products[index].image,
-                                        height: 200,
+                                        height: 190,
                                         fit: BoxFit.cover,
                                         width: double.infinity,
                                       ),

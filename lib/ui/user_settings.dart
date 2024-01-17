@@ -19,8 +19,7 @@ class UserSettingsScreen extends StatelessWidget {
         child: Column(
           children: [
             buildCategoryTile(context, "Kullanıcı Bilgilerim", Icons.person_2, width,UserInfoUpdate()),
-            buildCategoryTile(context, "Adres Bilgilerim", Icons.home, width,UserInfoUpdate()),
-            buildCategoryTile(context, "Kayıtlı Kartlarım", Icons.credit_card, width,UserInfoUpdate()),
+            //buildCategoryTile(context, "Adres Bilgilerim", Icons.home, width,UserInfoUpdate()),
             buildCategoryTile(context, "E-Posta değişikliği",Icons.mail, width,UserInfoUpdate()),
             buildCategoryTile(context, "Şifre değişikliği",Icons.password, width,UserPasswordUpdate()),
           ],

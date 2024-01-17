@@ -24,6 +24,8 @@ class _ShoppingBasketScreenState extends State<ShoppingBasketScreen> {
 
   late String? userId;
 
+  var kuponController = TextEditingController();
+
 
   Future<void> fetchData() async {
     userId = await authService.getCurrentUserId();
@@ -171,6 +173,39 @@ class _ShoppingBasketScreenState extends State<ShoppingBasketScreen> {
                   },
                 ),
               ),
+
+              SizedBox(height: 10), // Add some space between the total and the new TextField
+              Padding(
+                padding: const EdgeInsets.only(left: 10,right: 10,bottom: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            labelText: 'İndirim Kuponu',
+                          ),
+                           controller: kuponController,
+                          // onChanged: (value) {
+                          //   // Handle the entered value
+                          // },
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10), // Add some space between the TextField and the button
+                    ElevatedButton(
+                      onPressed: () {
+
+                      },
+                      child: Text('Tamam'),
+                    ),
+                  ],
+                ),
+              ),
+
+
               Padding(
                 padding: EdgeInsets.only(left: 10,right: 10,bottom: 30),
                 child: Row(
