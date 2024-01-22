@@ -510,35 +510,42 @@ class _HomeScreenState extends State<HomeScreen> {
                                             },
                                             child: ClipRRect(
                                               borderRadius: BorderRadius.circular(10),
-                                              child: Image.network(
+                                              child: product.image != null
+                                                  ? Image.network(
                                                 product.image,
                                                 width: 150,
                                                 height: 190,
                                                 fit: BoxFit.cover,
-                                              ),
+                                              )
+                                                  : Placeholder(), // Add a placeholder or handle null image case
                                             ),
                                           ),
                                           AnimatedOpacity(
                                             duration: const Duration(milliseconds: 100),
                                             opacity: isLikeAnimating ? 1 : 0,
-                                            child: LikeAnimation(child: Padding(
-                                              padding: const EdgeInsets.only(top: 85),
-                                              child: Center(child: Icon(Icons.favorite, color: Colors.white, size:40,)),
+                                            child: LikeAnimation(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(top: 85),
+                                                child: Center(
+                                                  child: Icon(
+                                                    Icons.favorite,
+                                                    color: Colors.white,
+                                                    size: 40,
+                                                  ),
+                                                ),
+                                              ),
+                                              isAnimating: isLikeAnimating,
+                                              duration: const Duration(milliseconds: 100),
+                                              onEnd: () {
+                                                setState(() {
+                                                  isLikeAnimating = true;
+                                                });
+                                              },
+                                              smallLike: true,
                                             ),
-                                          isAnimating: isLikeAnimating,
-                                          duration: const Duration(
-                                              milliseconds: 100
                                           ),
-                                          onEnd : () {
-                                            setState(() {
-                                              isLikeAnimating = true;
-                                            });
-                                          }, smallLike: true,
-                                             ),
-                                          )
-                                          ]
+                                        ],
                                       ),
-
                                       Positioned(
                                         top: 10,
                                         right: 10,
@@ -551,12 +558,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                           padding: EdgeInsets.all(1),
                                           child: LikeAnimation(
-                                            isAnimating: product.likes.contains(userProvider.getUser.uid),
+                                            isAnimating: product.likes
+                                                .contains(userProvider.getUser.uid),
                                             smallLike: false,
                                             child: IconButton(
-                                              icon: product.likes.contains(userProvider.getUser.uid)  ?
-                                             const Icon(Icons.favorite,color: Colors.red,) :
-                                              const Icon(Icons.favorite_border),
+                                              icon: product.likes.contains(userProvider.getUser.uid)
+                                                  ? const Icon(Icons.favorite, color: Colors.red)
+                                                  : const Icon(Icons.favorite_border),
                                               color: Colors.pink.shade400,
                                               iconSize: 20,
                                               onPressed: () async {
@@ -569,8 +577,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 setState(() {
                                                   isLikeAnimating = false;
                                                 });
-                                              }
-
+                                              },
                                             ),
                                           ),
                                         ),
@@ -583,7 +590,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       left: 6,
                                     ),
                                     child: Text(
-                                      product.title,
+                                      product.title ?? '',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(fontSize: 15),
                                     ),
@@ -595,7 +602,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       left: 6,
                                     ),
                                     child: Text(
-                                      product.price + "₺",
+                                      product.price ?? '' + "₺",
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -612,7 +619,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   }
                 },
-              ),
+              )
             ),
           ],
         ),

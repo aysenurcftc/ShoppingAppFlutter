@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:senior_project/service/auth.dart';
+import 'package:senior_project/ui/login/email_verification_screen.dart';
 import 'package:senior_project/ui/login/login-screen.dart';
 import 'package:senior_project/utils/utils.dart';
 
@@ -31,6 +32,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   var obscureText = true;
 
   AuthService authservice = AuthService();
+
+  final verified = EmailVerificationScreen();
 
 
   selectImage() async {
@@ -66,11 +69,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
         username: userNameController.text,
         surname: surnameController.text,
         file: _image!);
+
     // if string returned is sucess, user has been created
     if (res == "success") {
       setState(() {
         _isLoading = false;
       });
+
+
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => EmailVerificationScreen(),
+      ));
       // navigate to the home screen
 
       setState(() {

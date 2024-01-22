@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/ui/bottomnav-screen.dart';
+import 'package:senior_project/ui/login/email_verification_screen.dart';
 import 'package:senior_project/ui/login/forgotpass-screen.dart';
 import 'package:senior_project/ui/login/register-screen.dart';
 import 'package:senior_project/utils/utils.dart';
@@ -26,29 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   var obscureText = true;
 
-
   AuthService authservice = AuthService();
-
-
-  /*
-  Future<void> signInWithEmailAndPassword() async {
-    try {
-      authservice.signIn(
-          context,
-          email: emailController.text,
-          password: passwordController.text
-      );
-    } on FirebaseAuthException catch(e){
-      showDialog(context: context, builder: (context){
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20), // Kenar yarıçapını ayarlayın
-          ),
-          content: Text(e.message.toString()),
-        );
-      });
-    }
-  }*/
 
   Future<void> signInWithGoogle() async {
     try {
@@ -76,11 +55,14 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = true;
     });
+
     String res = await AuthService().loginUser(email: emailController.text, password: passwordController.text);
     if(res == 'success'){
       Navigator.of(context as BuildContext).pushReplacement(MaterialPageRoute(builder: (context) => Home()));
     }else{
+
       showSnackBar(context as BuildContext, res);
+
     }
     setState(() {
       _isLoading = false;

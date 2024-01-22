@@ -1,7 +1,7 @@
 
 
+import 'dart:async';
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,12 +12,16 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:senior_project/resources/storage_methods.dart';
 import 'package:senior_project/models/users.dart' as model;
 import 'package:senior_project/ui/login/login-screen.dart';
-
 import '../models/wallet.dart';
 
 
 
+
 class AuthService {
+
+  late User user;
+  late Timer timer;
+
   
   final userCollection = FirebaseFirestore.instance.collection("users");
 
@@ -172,6 +176,8 @@ class AuthService {
 
 
 
+
+  /*
   Future<String> signupUser ({
     required String name,
     required String surname,
@@ -230,6 +236,79 @@ class AuthService {
       res = err.toString();
     }
     return res;
+  }*/
+
+  Future<String> signupUser({
+    required String name,
+    required String surname,
+    required String username,
+    required String email,
+    required String password,
+    required Uint8List file,
+  }) async {
+    String res = "Some error occurred!";
+    try {
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp();
+      }
+
+      if (email.isNotEmpty ||
+          password.isNotEmpty ||
+          username.isNotEmpty ||
+          name.isNotEmpty ||
+          surname.isNotEmpty ||
+          file != null) {
+        UserCredential cred = await auth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        print(cred.user!.uid);
+
+        String photoUrl =
+        await StorageMethods().uploadImageToStorage("profilePics", file, false);
+
+        model.Users user = model.Users(
+          username: username,
+          uid: cred.user!.uid,
+          photoUrl: photoUrl,
+          email: email,
+          name: name,
+          surname: surname,
+          followers: [],
+          following: [],
+        );
+
+        await _firestore.collection("users").doc(cred.user!.uid).set(user.toJson());
+
+
+        Wallet userWallet = Wallet(
+          uid: cred.user!.uid,
+          price: "100000", // İlk cüzdan bakiyesini 1000 olarak ayarla, ihtiyaca göre değiştirilebilir
+          timestamp: DateTime.now(),
+        );
+
+        await _firestore.collection("wallets").doc(cred.user!.uid).set(userWallet.toJson());
+
+        // E-posta doğrulama e-postasını gönder
+        await cred.user!.sendEmailVerification();
+
+        res = "success";
+      }
+    } catch (err) {
+      print('Hata yakalandı: $err');
+      res = err.toString();
+    }
+    return res;
+  }
+
+
+  Future<bool> checkEmailVerified() async {
+    user = auth.currentUser!;
+    await user.reload();
+    if(user.emailVerified){
+      return user.emailVerified;
+    }
+    return false;
   }
 
 
@@ -243,21 +322,44 @@ class AuthService {
     String res = "Some error occured!";
 
     try{
-      if(email.isNotEmpty || password.isNotEmpty){
+      if(email.isNotEmpty || password.isNotEmpty) {
         await auth.signInWithEmailAndPassword(email: email, password: password);
-        res = "success";
-
+        UserCredential credential = await auth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        if (credential.user != null) {
+          bool isEmailVerified = await checkEmailVerified();
+          if (isEmailVerified) {
+            return 'success';
+          } else {
+            await sendEmailVerification();
+            await auth.signOut(); // Kullanıcıyı çıkış yap
+            return 'E-posta kontrol edin ve e-postanızı doğrulayın.';
+          }
+          //res = "success";
+        }
+        else {
+          res = "Tüm alanları doldurun.";
+        }
       }
-      else{
-        res = "Please enter all the fields";
-      }
-
     }
     catch(err){
       res = err.toString();
     }
     return res;
+  }
 
+  sendEmailVerification() async {
+    try {
+      await user.sendEmailVerification();
+      timer = Timer.periodic(Duration(seconds: 5), (timer) {
+        checkEmailVerified();
+      });
+      print('E-posta doğrulama e-postası gönderildi.');
+    } catch (e) {
+      print('E-posta doğrulama e-postası gönderilirken hata oluştu: $e');
+    }
   }
 
 
