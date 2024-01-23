@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:senior_project/service/contrat_service.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:crypto/crypto.dart';
 
@@ -21,13 +20,13 @@ class _myCouponScreenState extends State<myCouponScreen> {
   String couponCode = "";
   String? userId;
 
-  late CouponService _couponService;
+
 
   @override
   void initState() {
     super.initState();
     getUserId();
-    _couponService = CouponService();
+
   }
 
   Future<void> getUserId() async {
@@ -51,25 +50,7 @@ class _myCouponScreenState extends State<myCouponScreen> {
   }
 
 
-  Future<void> useCoupon() async {
-    if (userId != null) {
-      // Firebase UID'yi Ethereum adresine dönüştürün
-      EthereumAddress ethereumAddress = convertFirebaseUidToEthereumAddress(userId!);
 
-      try {
-        // Dönüştürülmüş Ethereum adresini kullanarak kuponu kullanma işlemini gerçekleştirin
-        await _couponService.useCoupon(ethereumAddress.hex);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Coupon used successfully'),
-        ));
-      } catch (error) {
-        print('Error using coupon: $error');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Error using coupon'),
-        ));
-      }
-    }
-  }
 
   String generateCouponCode() {
     final Random _random = Random();
@@ -129,7 +110,7 @@ class _myCouponScreenState extends State<myCouponScreen> {
                     couponCode = generateCouponCode();
                   });
                   addCouponToUser();
-                  useCoupon();// Add the coupon to the user's list
+
                 },
                 child: Text('Kupon Oluştur'),
               ),
@@ -159,4 +140,3 @@ class _myCouponScreenState extends State<myCouponScreen> {
   }
 }
 
-//OL1CD94ICUHWCHA82T

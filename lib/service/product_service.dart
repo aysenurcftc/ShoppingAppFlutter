@@ -5,6 +5,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:senior_project/models/products.dart';
 import 'package:senior_project/models/users.dart' as model;
 import 'package:senior_project/service/auth.dart';
+import 'package:uuid/uuid.dart';
+
 
 
 
@@ -62,8 +64,6 @@ class ProductService {
     }
   }
 
-// Add other authentication-related methods if needed
-
 
 
   Future<String> uploadImageToStorage(String childName, Uint8List file) async {
@@ -79,6 +79,10 @@ class ProductService {
     }
   }
 
+
+
+
+
   Future<void> addProductToFirestore(
       String title,
       String description,
@@ -88,64 +92,71 @@ class ProductService {
       String condition,
       String uid,
       Uint8List? image,
+      String profImage,
+      String name,
       ) async {
     try {
+
       String? userId = await auth.getCurrentUserId();
       if (userId != null) {
         String imageUrl = '';
         if (image != null) {
           imageUrl = await uploadImageToStorage('products', image);
         }
-        DocumentReference userDocRef =
-        FirebaseFirestore.instance.collection('users').doc(userId);
 
-        CollectionReference userProductsCollection =
-        userDocRef.collection('products');
+        String productId = Uuid().v4();
 
-        await userProductsCollection.doc(uid).set({
-          'title': title,
-          'description': description,
-          'price': price,
-          'size': size,
-          'category': category,
-          'condition': condition,
-          'image': imageUrl,
-          'uid': uid,
-          'timestamp': FieldValue.serverTimestamp(),
-          'likes': [],
-        });
+        CollectionReference userProductsCollection = FirebaseFirestore.instance.collection('products');
+        Product product = Product(
+            title: title,
+            productId: productId,
+            description: description,
+            price: price,
+            size: size,
+            category: category,
+            condition: condition,
+            uid: userId,
+            image: imageUrl,
+            timestamp: DateTime.now(),
+            profImage: profImage,
+            name: name,
+            likes: []);
 
-
+        await userProductsCollection.doc(productId).set(product.toJson());
         print('Ürün başarıyla eklendi. Product ID:');
+
       }
     } catch (e) {
+
       print('Ürün eklenirken bir hata oluştu: $e');
+
     }
   }
 
 
+
   Future<List<Product>> getUserProducts() async {
     try {
-      String? userId = await auth.getCurrentUserId();
-      if (userId != null) {
-        CollectionReference productsCollection =
-        FirebaseFirestore.instance.collection('users').doc(userId).collection('products');
+      String userId = _auth.currentUser!.uid;
+      CollectionReference productsCollection = _firestore.collection('products');
 
-        QuerySnapshot querySnapshot = await productsCollection.get();
+      QuerySnapshot querySnapshot = await productsCollection
+          .where('uid', isEqualTo: userId) // Sadece mevcut kullanıcının ürünlerini al
+          .get();
 
-        List<Product> userProducts = querySnapshot.docs
-            .map((doc) => Product.fromSnap(doc))
-            .toList();
-
-        return userProducts;
-      }
+      List<Product> userProducts = querySnapshot.docs
+          .map((doc) => Product.fromSnap(doc))
+          .toList();
+      return userProducts;
     } catch (e) {
       print('Ürünleri çekerken bir hata oluştu: $e');
       print('Hata ayrıntıları: ${e.toString()}');
       return [];
     }
-    return [];
   }
+
+
+
 
   Future<List<Product>> getAllUsersProducts() async {
     try {
@@ -155,7 +166,7 @@ class ProductService {
 
       for (QueryDocumentSnapshot userDoc in usersSnapshot.docs) {
         String userId = userDoc.id;
-        CollectionReference productsCollection = usersCollection.doc(userId).collection('products');
+        CollectionReference productsCollection = FirebaseFirestore.instance.collection('products');
         QuerySnapshot productsSnapshot = await productsCollection.get();
 
         List<Product> userProducts = productsSnapshot.docs
@@ -172,49 +183,11 @@ class ProductService {
   }
 
 
+
+
+
+
   /*
-  Future<void> likeProduct(String productIdentifier, bool isLiked) async {
-    try {
-      String? userId = await auth.getCurrentUserId();
-
-      if (userId != null) {
-        DocumentReference userDocRef = FirebaseFirestore.instance.collection(
-            'users').doc(userId);
-
-
-        List<dynamic> userLikes = (await userDocRef.get()).get('like') ?? [];
-
-        QuerySnapshot productQuerySnapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userId)
-            .collection('products')
-            .where('uid', isEqualTo: productIdentifier)
-            .limit(1)
-            .get();
-
-        if (productQuerySnapshot.docs.isNotEmpty) {
-          DocumentSnapshot productDocument = productQuerySnapshot.docs.first;
-          DocumentReference productDocRef = productDocument.reference;
-
-          // Ürün dokümanını güncelle
-          await productDocRef.update({'isLiked': !isLiked});
-
-          if (isLiked) {
-            userLikes.remove(productIdentifier);
-            print('Ürün beğenisi kaldırıldı.');
-          } else {
-            userLikes.add(productIdentifier);
-            print('Ürün beğenildi.');
-          }
-          // Kullanıcı koleksiyonundaki 'like' alanını güncelle
-          await userDocRef.update({'like': userLikes});
-        }
-      }
-    } catch (e) {
-      print('Ürünü beğenirken bir hata oluştu: $e');
-    }
-  }*/
-
   Stream<List<Product>> streamAllUsersProducts() {
     return _firestore.collection('users').snapshots().asyncMap(
           (snapshot) async {
@@ -222,7 +195,7 @@ class ProductService {
 
         for (QueryDocumentSnapshot userDoc in snapshot.docs) {
           String userId = userDoc.id;
-          CollectionReference productsCollection = _firestore.collection('users').doc(userId).collection('products');
+          CollectionReference productsCollection = _firestore.collection('products');
 
           // Use `await` here to get the products snapshot
           QuerySnapshot productsSnapshot = await productsCollection.get();
@@ -231,6 +204,22 @@ class ProductService {
               .map((doc) => Product.fromSnap(doc))
               .toList();
           allUsersProducts.addAll(userProducts);
+        }
+
+        return allUsersProducts;
+      },
+    );
+  }*/
+
+
+  Stream<List<Product>> streamAllUsersProducts() {
+    return FirebaseFirestore.instance.collection('products').snapshots().asyncMap(
+          (snapshot) async {
+        List<Product> allUsersProducts = [];
+
+        for (QueryDocumentSnapshot productDoc in snapshot.docs) {
+          Product product = Product.fromSnap(productDoc);
+          allUsersProducts.add(product);
         }
 
         return allUsersProducts;
@@ -247,12 +236,12 @@ class ProductService {
 
     try {
       if (likes.contains(uid)) {
-        _firestore.collection('users').doc(uid).collection('products').doc(productId).update({
+        _firestore.collection('products').doc(productId).update({
           'likes': FieldValue.arrayRemove([uid])
         });
       } else {
         // else we need to add uid to the likes array
-        _firestore.collection('users').doc(uid).collection('products').doc(productId).update({
+        _firestore.collection('products').doc(productId).update({
           'likes': FieldValue.arrayUnion([uid])
         });
       }
@@ -264,38 +253,51 @@ class ProductService {
   }
 
 
-
-  /*
-
-  Future<void> likePost(String productId, String userId, List<dynamic> currentLikes) async {
-
-    String? userId = await auth.getCurrentUserId();
-
+  Future<String> postComment(String productId, String text, String uid, String name, String profilePic) async {
+    String res = "Some error occurred";
     try {
-
-      DocumentReference productRef = _firestore.collection('users').doc(userId).collection('products').doc(productId);
-
-      // Convert currentLikes to List<String>
-      List<String> likes = currentLikes.map((like) => like.toString()).toList();
-
-      // Check if the user has already liked the product
-      if (likes.contains(userId)) {
-        // If the user has already liked, remove the like
-        likes.remove(userId);
+      if (text.isNotEmpty) {
+        // if the likes list contains the user uid, we need to remove it
+        String commentId = const Uuid().v1();
+        _firestore
+            .collection('products')
+            .doc(productId)
+            .collection('comments')
+            .doc(commentId)
+            .set({
+          'profilePic': profilePic,
+          'name': name,
+          'uid': uid,
+          'text': text,
+          'commentId': commentId,
+          'datePublished': DateTime.now(),
+        });
+        res = 'success';
       } else {
-        // If the user has not liked, add the like
-        likes.add(userId!);
+        res = "Please enter text";
       }
-
-      // Update the likes in Firestore
-      await productRef.update({'likes': likes});
-    } catch (e) {
-      print('Error updating likes: $e');
-      // Print additional information about the document
-      print('Document Path: users/$userId/products/$productId');
+    } catch (err) {
+      res = err.toString();
     }
+    return res;
   }
-  */
+
+
+  // Delete Post
+  Future<String> deletePost(String productId) async {
+    String res = "Some error occurred";
+    try {
+      await _firestore.collection('products').doc(productId).delete();
+      res = 'success';
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
+
+
+
 
 
 

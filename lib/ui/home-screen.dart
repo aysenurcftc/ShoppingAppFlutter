@@ -29,6 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
     String query = _searchController.text;
   }
 
+
+
+
   final AuthService authService = AuthService();
   final ProductService firestoreService = ProductService();
   late Future<List<Product>> userProducts;
@@ -63,6 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
+
+
+
+
   Future<void> getUserData() async {
 
     userData = await firestoreService.getUserData();
@@ -71,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool isLikeAnimating = false;
 
+
   Color myColor = Color(0xFFF3E9E0);
 
   @override
@@ -78,8 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
     var screenSize = MediaQuery.of(context);
     final double height = screenSize.size.height;
     final double width = screenSize.size.width;
-
-    //final Users user = Provider.of<UserProvider>(context).getUser;
 
 
     return Scaffold(
@@ -424,7 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => NewProductScreen(userProducts)),
+                        MaterialPageRoute(builder: (context) => NewProductScreen()),
                       );
                     },
                     child: Text("Tümünü gör",
@@ -441,185 +447,203 @@ class _HomeScreenState extends State<HomeScreen> {
 
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: StreamBuilder<List<Product>>(
-                stream: firestoreService.streamAllUsersProducts(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    List<Product> products = snapshot.data ?? [];
-                    return Row(
-                      children: products.map((product) {
-                        final int index = products.indexOf(product);
-                        final bool isLiked = liked.contains(index);
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            width: 150,
-                            height: 280,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  spreadRadius: 3,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProductDetailScreen(
-                                      product.image,
-                                      product.title,
-                                      product.price,
-                                      product.description,
-                                      product.category,
-                                      product.condition,
-                                      product.size,
-                                      product.uid,
-                                      product.likes,
-                                    ),
+              child: Consumer<ProductProvider>(
+                builder: (context, _productProvider, widget){
+                  return StreamBuilder<List<Product>>(
+                  stream: firestoreService.streamAllUsersProducts(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<Product> products = snapshot.data ?? [];
+                      return Row(
+                        children: products.map((product) {
+                          final int index = products.indexOf(product);
+                          final bool isLiked = liked.contains(index);
+                          bool isLikedProduct = product.likes.contains(userProvider.getUser.uid);
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              width: 150,
+                              height: 280,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    spreadRadius: 3,
+                                    blurRadius: 5,
+                                    offset: Offset(0, 3),
                                   ),
-                                );
-                              },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Stack(
-                                    children: [
-                                      Stack(
-                                        children: [
-                                          GestureDetector(
-                                            onDoubleTap: () async {
-                                              await ProductService().likePost(
-                                                product.uid,
-                                                userProvider.getUser.uid,
-                                                product.likes,
-                                              );
-                                              setState(() {
-                                                isLikeAnimating = true;
-                                              });
-                                            },
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(10),
-                                              child: product.image != null
-                                                  ? Image.network(
-                                                product.image,
-                                                width: 150,
-                                                height: 190,
-                                                fit: BoxFit.cover,
-                                              )
-                                                  : Placeholder(), // Add a placeholder or handle null image case
-                                            ),
-                                          ),
-                                          AnimatedOpacity(
-                                            duration: const Duration(milliseconds: 100),
-                                            opacity: isLikeAnimating ? 1 : 0,
-                                            child: LikeAnimation(
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(top: 85),
-                                                child: Center(
-                                                  child: Icon(
-                                                    Icons.favorite,
-                                                    color: Colors.white,
-                                                    size: 40,
-                                                  ),
-                                                ),
-                                              ),
-                                              isAnimating: isLikeAnimating,
-                                              duration: const Duration(milliseconds: 100),
-                                              onEnd: () {
+                                ],
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProductDetailScreen(
+                                        product.image,
+                                        product.title,
+                                        product.productId,
+                                        product.price,
+                                        product.description,
+                                        product.category,
+                                        product.condition,
+                                        product.size,
+                                        product.uid,
+                                        product.likes,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        Stack(
+                                          children: [
+                                            GestureDetector(
+                                              onDoubleTap: () async {
+                                                await ProductService().likePost(
+                                                  product.productId,
+                                                  product.uid,
+                                                  product.likes,
+                                                );
                                                 setState(() {
                                                   isLikeAnimating = true;
                                                 });
                                               },
-                                              smallLike: true,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(10),
+                                                child: product.image != null
+                                                    ? Image.network(
+                                                  product.image,
+                                                  width: 150,
+                                                  height: 190,
+                                                  fit: BoxFit.cover,
+                                                )
+                                                    : Placeholder(), // Add a placeholder or handle null image case
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      Positioned(
-                                        top: 10,
-                                        right: 10,
-                                        child: Container(
-                                          width: 40,
-                                          height: 40,
-                                          decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.white,
-                                          ),
-                                          padding: EdgeInsets.all(1),
-                                          child: LikeAnimation(
-                                            isAnimating: product.likes
-                                                .contains(userProvider.getUser.uid),
-                                            smallLike: false,
-                                            child: IconButton(
-                                              icon: product.likes.contains(userProvider.getUser.uid)
-                                                  ? const Icon(Icons.favorite, color: Colors.red)
-                                                  : const Icon(Icons.favorite_border),
-                                              color: Colors.pink.shade400,
-                                              iconSize: 20,
-                                              onPressed: () async {
-                                                await ProductService().likePost(
-                                                  product.uid,
-                                                  userProvider.getUser.uid,
-                                                  product.likes,
-                                                );
+                                            AnimatedOpacity(
+                                              duration: const Duration(milliseconds: 100),
+                                              opacity: isLikeAnimating ? 1 : 0,
+                                              child: LikeAnimation(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(top: 85),
+                                                  child: Center(
+                                                    child: Icon(
+                                                      Icons.favorite,
+                                                      color: Colors.white,
+                                                      size: 40,
+                                                    ),
+                                                  ),
+                                                ),
+                                                isAnimating: isLikeAnimating,
+                                                duration: const Duration(milliseconds: 100),
+                                                onEnd: () {
+                                                  setState(() {
+                                                    isLikeAnimating = true;
+                                                  });
+                                                },
+                                                smallLike: true,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Positioned(
+                                          top: 10,
+                                          right: 10,
+                                          child: Container(
+                                            width: 40,
+                                            height: 40,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white,
+                                            ),
+                                            padding: EdgeInsets.all(1),
+                                            child: LikeAnimation(
+                                              isAnimating: isLikedProduct ,
+                                              smallLike: false,
+                                              child: IconButton(
+                                                icon: isLikedProduct
+                                                    ? const Icon(Icons.favorite, color: Colors.red)
+                                                    : const Icon(Icons.favorite_border),
+                                                color: Colors.pink.shade400,
+                                                iconSize: 20,
+                                                onPressed: () async {
+                                                  await ProductService().likePost(
+                                                    products[index].productId,
+                                                    products[index].uid,
+                                                    products[index].likes,
+                                                  );
 
-                                                setState(() {
-                                                  isLikeAnimating = false;
-                                                });
-                                              },
+                                                  // Beğeni durumunu güncelle
+                                                  if (_productProvider.likedProductIds
+                                                      .contains(products[index].productId)) {
+                                                    _productProvider.removeFromLikedProducts(
+                                                        products[index].productId);
+                                                  } else {
+                                                    _productProvider.addToLikedProducts(
+                                                        products[index].productId);
+                                                  }
+                                                  setState(() {
+
+                                                  });
+
+                                                  // setState(() {
+                                                  //   isLikeAnimating = false;
+                                                  // });
+                                                },
+                                              ),
                                             ),
                                           ),
                                         ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 8,
+                                        left: 6,
                                       ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 8,
-                                      left: 6,
-                                    ),
-                                    child: Text(
-                                      product.title ?? '',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 15),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 10,
-                                      bottom: 5,
-                                      left: 6,
-                                    ),
-                                    child: Text(
-                                      product.price ?? '' + "₺",
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
+                                      child: Text(
+                                        product.title ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(fontSize: 15),
                                       ),
                                     ),
-                                  )
-                                ],
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 10,
+                                        bottom: 5,
+                                        left: 6,
+                                      ),
+                                      child: Text(
+                                        product.price ?? '' + "₺",
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }).toList(),
-                    );
-                  }
+                          );
+                        }).toList(),
+                      );
+                    }
+                  },
+                  );
                 },
-              )
+              ),
             ),
           ],
         ),

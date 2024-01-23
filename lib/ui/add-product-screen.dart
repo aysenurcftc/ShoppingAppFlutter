@@ -4,6 +4,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/ui/categories/categories_secreen.dart';
 import 'package:senior_project/ui/categories/size_screen.dart';
 import 'package:senior_project/ui/categories/state_screen.dart';
@@ -40,12 +42,21 @@ class _AddProductScreenState extends State<AddProductScreen> {
   var productExpController = TextEditingController();
   var productPriceController = TextEditingController();
 
+  late UserProvider userProvider;
   @override
   void initState() {
     super.initState();
     productTitleController = TextEditingController();
     productExpController = TextEditingController();
     productPriceController = TextEditingController();
+
+  }
+
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    userProvider = Provider.of<UserProvider>(context);
   }
 
 
@@ -416,7 +427,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         selectedOption,
                         uuid,
                         files,
-
+                        userProvider.getUser.photoUrl,
+                        userProvider.getUser.name,
                       );
 
                       ScaffoldMessenger.of(context).showSnackBar(

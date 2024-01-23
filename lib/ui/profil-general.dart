@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project/models/products.dart';
-import 'package:senior_project/models/users.dart';
 import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/service/product_service.dart';
@@ -40,7 +39,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
     username = authService.getCurrentUsername();
     userProvider = Provider.of<UserProvider>(context, listen: false);
     userProvider.fetchUser();
-     fetchData();
+    fetchData();
   }
 
 
@@ -120,7 +119,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                         ),
                         ),
                     ),
-                  )
+                  ),
                 ],
               ),
               Spacer(),
@@ -245,15 +244,77 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                                       children: [
                                         Stack(
                                           children: [
-                                            ClipRRect(
-                                              borderRadius: BorderRadius.circular(10),
-                                              child: Image.network(
-                                                products[index].image,
-                                                width: double.infinity,
-                                                height: 200,
-                                                fit: BoxFit.cover,
+                                            Stack(
+                                              children: [
 
+                                                ClipRRect(
+                                                borderRadius: BorderRadius.circular(10),
+                                                child: Image.network(
+                                                  products[index].image,
+                                                  width: double.infinity,
+                                                  height: 200,
+                                                  fit: BoxFit.cover,
+                                                ),
                                               ),
+
+                                                Positioned(
+                                                  top: 10,
+                                                  right: 10,
+                                                  child: Container(
+                                                    width: 50,
+                                                    height: 50,
+                                                    child: Stack(
+                                                      alignment: Alignment.center,
+                                                      children: [
+                                                        // Beyaz yuvarlak ikon (arka plan)
+                                                        Container(
+                                                          width: 40,
+                                                          height: 40,
+                                                          decoration: BoxDecoration(
+                                                            shape: BoxShape.circle,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                        // Çöp kutusu ikonu (üstte)
+                                                        IconButton(
+                                                            onPressed: () async {
+                                                               await showDialog(context: context, builder: (context) => Dialog(
+                                                                child: ListView(
+                                                                  padding: EdgeInsets.symmetric(vertical: 16),
+                                                                  shrinkWrap: true,
+                                                                  children: [
+                                                                    "Ürünü Sil"
+                                                                  ].map((e) => InkWell(
+                                                                    onTap: () async {
+                                                                     await  ProductService().deletePost(products[index].productId);
+                                                                      Navigator.of(context).pop();
+
+                                                                     setState(() {
+                                                                       userProducts = firestoreService.getUserProducts();
+                                                                     });
+
+                                                                    },
+                                                                    child: Container(
+                                                                      padding: EdgeInsets.symmetric(
+                                                                        vertical: 12,
+                                                                        horizontal: 16,
+                                                                      ),
+                                                                      child: Text(e),
+                                                                    ),
+                                                                  ),
+                                                                  ).toList(),
+                                                                ),
+                                                              ),
+                                                              );
+                                                            },
+                                                            icon: Icon(Icons.delete_outline) ,)
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+
+
+                                              ]
                                             ),
                                           ],
                                         ),
@@ -299,8 +360,6 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
               ],
             ),
           ),
-
-
           ]
         ),
       ),

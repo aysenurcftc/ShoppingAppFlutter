@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Product {
   late String title;
+  final String productId;
   late String description;
   late String price;
   late String size;
@@ -11,12 +12,16 @@ class Product {
   late String uid;
   late String image;
   late DateTime timestamp;
+  final String profImage;
+
+  final String name;
   final likes;
 
 
   // Constructor
   Product({
     required this.title,
+    required this.productId,
     required this.description,
     required this.price,
     required this.size,
@@ -25,6 +30,8 @@ class Product {
     required this.uid,
     required this.image,
     required this.timestamp,
+    required this.profImage,
+    required this.name,
     required this.likes,
   });
 
@@ -32,6 +39,7 @@ class Product {
     var snapshot = snap.data() as Map<String, dynamic>;
     return Product(
         title : snapshot['title'],
+        productId: snapshot['productId'],
         description: snapshot["description"],
         price : snapshot['price'],
         category : snapshot['category'],
@@ -40,6 +48,8 @@ class Product {
         uid: snapshot["uid"],
         image : snapshot['image'],
         timestamp: (snapshot['timestamp'] as Timestamp).toDate(),
+        profImage: snapshot['profImage'],
+        name: snapshot['name'],
         likes: snapshot["likes"],
 
     );
@@ -48,6 +58,7 @@ class Product {
 
   Map<String, dynamic> toJson() => {
     "title": title,
+    "productId": productId,
     "description": description,
     "price": price,
     "category": category,
@@ -56,24 +67,12 @@ class Product {
     'uid': uid,
     'image': image,
     'timestamp' : timestamp,
+    'profImage': profImage,
+    'name' : name,
     'likes' : likes,
   };
 
 
-  /*
-  Product.fromMap(Map<String, dynamic> data) {
-
-    title = data['title'] ?? '';
-    description = data['description'] ?? '';
-    price = data['price'] ?? '';
-    category = data['category'] ?? '';
-    condition = data['condition'] ?? '';
-    size = data['size'] ?? '';
-    uid = data['uid'] ?? '';
-    image = data['image'] ?? '';
-    timestamp = (data['timestamp'] as Timestamp).toDate();
-
-  }*/
 
 
 
