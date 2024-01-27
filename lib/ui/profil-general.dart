@@ -225,8 +225,6 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                 ),
               ),
               Spacer(),
-
-
             ],
           ),
         ),

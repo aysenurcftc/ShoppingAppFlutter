@@ -1,8 +1,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:senior_project/ui/profile-screen.dart';
 import 'package:senior_project/utils/colors.dart';
 
 
@@ -34,7 +32,7 @@ class _SearchScreenState extends State<SearchScreen> {
         title: TextFormField(
           controller: searchEditingController,
           decoration: InputDecoration(
-            labelText: "Search for a user",
+            labelText: "Ürün Ara",
           ),
           onFieldSubmitted: (String _){
             setState(() {
@@ -45,8 +43,8 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
       body: isShowUsers ? FutureBuilder(
-        future: FirebaseFirestore.instance.collection("users")
-            .where("username", isGreaterThanOrEqualTo: searchEditingController.text)
+        future: FirebaseFirestore.instance.collection("products")
+            .where("title", isGreaterThanOrEqualTo: searchEditingController.text)
             .get(),
         builder: (context, snapshot){
           if(!snapshot.hasData){
@@ -54,46 +52,84 @@ class _SearchScreenState extends State<SearchScreen> {
               child: CircularProgressIndicator(),
             );
           }
-          return ListView.builder(
-              itemCount: (snapshot.data! as dynamic).docs.length,
-              itemBuilder: (context, index){
-                return InkWell(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfileScreen(uid: (snapshot.data! as dynamic).docs[index]['uid']))),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        (snapshot.data! as dynamic).docs[index]['photoUrl'],
-                      ),
-                    ),
-                    title: Text((snapshot.data! as dynamic).docs[index]['username']),
-                  ),
-                );
-              }
-          );
-        },
-      ) : FutureBuilder(
-        future: FirebaseFirestore.instance.collection('posts').get(),
-        builder: (context, snapshot){
-          if(!snapshot.hasData){
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          return MasonryGridView.count(
-            crossAxisCount: 3,
-            itemCount: (snapshot.data! as dynamic).docs.length,
-            itemBuilder: (context, index) => Image.network(
-              (snapshot.data! as dynamic).docs[index]['postUrl'],
-              fit: BoxFit.cover,
+          return  GridView.builder(
+            shrinkWrap: true,
+            physics: BouncingScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
+              mainAxisExtent: 290.0,
             ),
-            mainAxisSpacing: 8.0,
-            crossAxisSpacing: 8.0,
+            itemCount: (snapshot.data! as dynamic).docs.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot snap = (snapshot.data! as dynamic).docs[index];
+              return Padding(
+                padding: EdgeInsets.only(left: 5),
+                child: Container(
+                  width: 140,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 3,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Stack(
+                        children: [
+                          Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  (snapshot.data! as dynamic).docs[index]['image'],
+                                  width: double.infinity,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, left: 6),
+                        child: Text(
+                          (snapshot.data! as dynamic).docs[index]['title'],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, bottom: 5, left: 6),
+                        child: Text(
+                          "${(snapshot.data! as dynamic).docs[index]['price']} ₺",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           );
-
-
         },
-
-
-      ),
+      ) : Center(
+        child: Text(""),
+      )
     );
   }
 }
