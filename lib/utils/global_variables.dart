@@ -4,6 +4,7 @@
 
 
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:senior_project/ui/add-product-screen.dart';
 import 'package:senior_project/ui/categories/categories_secreen.dart';
@@ -17,6 +18,6 @@ List<Widget> homeScreenItems = [
   CategoriesScreen(),
   AddProductScreen(),
   NotificationScreen(),
-  ProfileScreen(),
+  ProfileScreen( uid: FirebaseAuth.instance.currentUser!.uid,),
 
 ];

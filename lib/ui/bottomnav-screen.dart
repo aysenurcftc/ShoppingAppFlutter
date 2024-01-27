@@ -1,9 +1,11 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:senior_project/ui/add-product-screen.dart';
 import 'package:senior_project/ui/categories/categories_secreen.dart';
 import 'package:senior_project/ui/home-screen.dart';
 import 'package:senior_project/ui/notification_screen.dart';
+import 'package:senior_project/ui/profil-general.dart';
 import 'package:senior_project/ui/profile-screen.dart';
 import 'package:senior_project/ui/shopping_basket_screen.dart';
 
@@ -25,7 +27,8 @@ class _HomeState extends State<Home> {
       CategoriesScreen(),
       AddProductScreen(),
       NotificationScreen(),
-      ProfileScreen(),
+      ProfileScreen(uid:FirebaseAuth.instance.currentUser!.uid ,),
+      //ProfileGeneral(uid:,),
   ];
 
   TextEditingController _searchController = TextEditingController();

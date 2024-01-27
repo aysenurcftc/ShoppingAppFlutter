@@ -5,12 +5,15 @@ import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/ui/myWallet.dart';
 import 'package:senior_project/ui/my_coupon.dart';
 import 'package:senior_project/ui/my_orders.dart';
-import 'package:senior_project/ui/profile-detail-screen.dart';
+import 'package:senior_project/ui/profil-general.dart';
 import 'package:senior_project/ui/user_settings.dart';
 
 
 class ProfileScreen extends StatefulWidget {
 
+  final String uid;
+
+  const ProfileScreen({super.key, required this.uid});
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
@@ -36,6 +39,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     userProvider.fetchUser();
 
   }
+
+
 
 
   @override
@@ -97,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ProfileDetailScreen()),
+                        MaterialPageRoute(builder: (context) => ProfileGeneral(uid: widget.uid)),
                       );
                     },
                     child: Text("Sayfama git",
@@ -130,7 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onTap: (){
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => ProfileDetailScreen()),
+                            MaterialPageRoute(builder: (context) =>  ProfileGeneral(uid: widget.uid)),
                           );
                         },
                         child: Container(

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project/models/basket_product.dart';
@@ -6,8 +7,10 @@ import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/commets_screen.dart';
 import 'package:senior_project/ui/create_coupon.dart';
+import 'package:senior_project/ui/profil-general.dart';
 import 'package:senior_project/ui/shopping_basket_screen.dart';
 import 'package:senior_project/providers/basket_provider.dart';
+import 'package:senior_project/utils/utils.dart';
 import 'package:senior_project/widgets/like_animation.dart';
 
 
@@ -40,6 +43,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   late UserProvider userProvider;
   late ProductProvider productProvider;
 
+  late String photoUrl;
+  late String username;
+  late String uid;
+
   @override
   void initState() {
     super.initState();
@@ -47,10 +54,32 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     userProvider.fetchUser();
     productProvider = Provider.of<ProductProvider>(context, listen: false);
     isLiked = widget.likes.contains(userProvider.getUser.uid);
+    getData();
   }
 
   bool isLikeAnimating = false;
   late bool isLiked;
+  bool isLoading = false;
+
+
+  getData() async {
+    setState(() {
+      isLoading = true;
+    });
+    try{
+      var userSnap = await FirebaseFirestore.instance.collection('users').doc(widget.uid).get();
+      photoUrl = userSnap.data()!['photoUrl'];
+      username = userSnap.data()!['username'];
+      uid = userSnap.data()!['uid'];
+
+      setState(() {});
+    }catch(e){
+      showSnackBar(context, e.toString());
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
 
 
 
@@ -65,7 +94,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
 
 
-    return Scaffold(
+    return isLoading ? const Center(child: CircularProgressIndicator(),) : Scaffold(
       body: Consumer<ProductProvider>(builder: (context, productProvider, child){
         return SingleChildScrollView(
           child: Column(
@@ -253,11 +282,56 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 18,right: 18,top: 10,bottom: 20),
                 child: Text( widget.description,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 16,
-                ),),
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 16,
+                  ),),
               ),
+
+              Divider(),
+
+              Container(
+                width: width,
+                height: 100,
+                color: Colors.white,
+                child: Padding(
+                  padding:  EdgeInsets.only(left: 18,right: 18,top: 20,bottom: 20),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 100,
+                        width: 100,
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            photoUrl,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(username,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            ),
+                            GestureDetector(
+                              onTap: (){
+                                Navigator.of(context).push(MaterialPageRoute(builder: (contex) => ProfileGeneral(uid: uid)));
+                              },
+                                child: Text("Satıcıyı görüntüle >")),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                ),
+              ),
+
+              Divider(),
 
               GestureDetector(
                 onTap: () {
@@ -318,16 +392,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ],
                       ),
 
-                      /*TextField(
-                        decoration: InputDecoration(
-                          hintText: "Satıcıya Sor",
-                          hintStyle: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),*/
 
 
                     ],

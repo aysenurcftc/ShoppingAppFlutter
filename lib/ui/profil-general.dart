@@ -1,18 +1,24 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project/models/products.dart';
 import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/service/product_service.dart';
-import 'package:senior_project/ui/user_settings.dart';
+import 'package:senior_project/widgets/follow_button.dart';
+import '../utils/utils.dart';
 
 class ProfileGeneral extends StatefulWidget {
+
+  final String uid;
+
+  const ProfileGeneral({super.key, required this.uid});
 
   @override
   State<ProfileGeneral> createState() => _ProfileGeneralState();
 }
-
 
 
 class _ProfileGeneralState extends State<ProfileGeneral> {
@@ -23,7 +29,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
   late Future<String?> username;
 
 
-  late String? uid;
+  //late String? uid;
   var userData = {};
   int followers = 0;
   int following = 0;
@@ -37,15 +43,48 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
     super.initState();
     userProducts =  firestoreService.getUserProducts();
     username = authService.getCurrentUsername();
-    userProvider = Provider.of<UserProvider>(context, listen: false);
-    userProvider.fetchUser();
-    fetchData();
+    //userProvider = Provider.of<UserProvider>(context, listen: false);
+    //userProvider.fetchUser();
+    //fetchData();
+    getData();
+    setState(() {});
   }
 
 
-  Future<void> fetchData() async {
+  /*Future<void> fetchData() async {
     uid = await authService.getCurrentUserId();
+  }*/
+
+  Future<void> getData() async {
+    setState(() {
+      isLoading = true;
+    });
+    try{
+      var userSnap = await FirebaseFirestore.instance.collection('users').doc(widget.uid).get();
+
+      // get post lENGTH
+      var productSnap = await FirebaseFirestore.instance
+          .collection('products')
+          .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+
+        userData = userSnap.data()!;
+        followers = userSnap.data()!['followers'].length;
+        following = userSnap.data()!['following'].length;
+        isFollowing = userSnap
+            .data()!['followers']
+            .contains(FirebaseAuth.instance.currentUser!.uid);
+
+      setState(() {});
+    }catch(e){
+      showSnackBar(context, e.toString());
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
+
 
 
   @override
@@ -60,6 +99,9 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
         child: CircularProgressIndicator(),
         )
         : Scaffold(
+        appBar: AppBar(
+          title: FirebaseAuth.instance.currentUser!.uid != widget.uid ? Text(userData["username"]) : Text("Profilim"),
+        ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
@@ -70,125 +112,144 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
           width: width,
           child: Row(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 20, top: 8, bottom: 5),
-                    child: Consumer<UserProvider>(
+              Padding(
+                padding:  EdgeInsets.only(left: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Consumer<UserProvider>(
                       builder: (context, value,child) {
-                        return Container(
-                          width: 100,
-                          height: 100,
-                          child: CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              value.getUser?.photoUrl ?? "https://i.pinimg.com/736x/8b/25/91/8b259121597545e2739974384c18a8e6.jpg",
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 100,
+                              child: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  userData["photoUrl"] ?? "https://i.pinimg.com/736x/8b/25/91/8b259121597545e2739974384c18a8e6.jpg",
+                                ),
+                              ),
                             ),
-                          ),
+
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 54),
+                              child: Row(
+                                children: [
+                                  Text("Takip: ${following}",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.grey.shade600,
+                                        fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 15),
+                                    child: Text("Takipçi: ${followers}",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.grey.shade600,
+                                          fontWeight: FontWeight.bold
+                                      ),
+                                    ),
+                                  ),
+
+                                ],
+                              ),
+                            ),
+
+                          ],
                         );
                       },
                     ),
-                  ),
 
-                  Padding(
-                    padding:  EdgeInsets.only(left: 50,top: 8),
-                    child:  Consumer<UserProvider>(
-                      builder: (BuildContext context, UserProvider value, Widget? child) {
-                        return Text(
-                          value.getUser?.name ?? "Kullanıcı",
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        );
-                      },
+                    Padding(
+                      padding:  EdgeInsets.only(left: 20,top: 10, bottom: 5),
+                      child: Consumer<UserProvider>(
+                        builder: (BuildContext context, UserProvider value, Widget? child) {
+                          return Text(
+                            userData["username"] ?? "Kullanıcı",
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
 
-                  Padding(
-                    padding: const EdgeInsets.only(left: 25,top: 10),
-                    child: ElevatedButton(onPressed: (){},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.pinkAccent.shade100,
-                        ),
-                        child: Text("Takip",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                        ),
-                    ),
-                  ),
-                ],
-              ),
-              Spacer(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    children: [
-                      IconButton(onPressed: (){
-                        Navigator.pop(context);
-                      }, icon: Icon(Icons.arrow_back)),
-                      IconButton(onPressed: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => UserSettingsScreen()),
-                        );
-                      }, icon: Icon(Icons.settings,
-                      size: 28,)),
-                    ],
-                  ),
-                  Spacer(),
-                  Padding(
-                    padding: EdgeInsets.only(right: 8,bottom: 8),
-                    child: Row(
+                    Row(
                       children: [
-                        Padding(
-                          padding:  EdgeInsets.only(right: 8),
-                          child: Text("Takip: 0",
-                            style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.grey.shade600,
-                              fontWeight: FontWeight.bold
-                          ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 8),
-                          child: Text("Takipçi: 0",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.grey.shade600,
-                              fontWeight: FontWeight.bold
-                            ),),
+                        FirebaseAuth.instance.currentUser!.uid == widget.uid? Text("")
+                         : isFollowing ? FollowButton(
+                          text: "Takip",
+                          backgroundColor: Colors.pinkAccent,
+                          textColor: Colors.white,
+                          borderColor: Colors.white,
+                          function: () async {
+                            await ProductService()
+                                .followUser(
+                              FirebaseAuth.instance
+                                  .currentUser!.uid,
+                              userData['uid'],
+                            );
+
+                            setState(() {
+                              isFollowing = false;
+                              followers--;
+                            });
+                          },
+                        ) : FollowButton(
+                          text: "Takip et",
+                          backgroundColor: Colors.white,
+                          textColor: Colors.white,
+                          borderColor: Colors.pinkAccent,
+                          function: () async{
+                            await ProductService()
+                                .followUser(
+                              FirebaseAuth.instance
+                                  .currentUser!.uid,
+                              userData['uid'],
+                            );
+                            setState(() {
+                              isFollowing = true;
+                              followers++;
+                            });
+                          },
                         ),
 
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              Spacer(),
+
+
             ],
           ),
         ),
 
+          Divider(),
           SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FutureBuilder<List<Product>>(
-                  future: userProducts,
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('products')
+                      .where('uid', isEqualTo: widget.uid)
+                      .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
                     } else if (snapshot.hasError) {
                       return Text('Hata oluştu: ${snapshot.error}');
                     } else {
-                      List<Product>? products = snapshot.data;
-                      if (products != null && products.isNotEmpty) {
+                      var products = (snapshot.data! as dynamic).docs.length;
+                      if (products != null) {
                         return Column(
                           children: [
                             Padding(
@@ -196,7 +257,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                               child: Row(
                                 children: [
                                   Text(
-                                    'Toplam: ${products.length} ürün',
+                                    'Toplam: ${products} ürün',
                                     style: TextStyle(
                                       fontSize: 15,
                                       color: Colors.grey.shade600,
@@ -218,14 +279,15 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                                 crossAxisCount: 2,
                                 crossAxisSpacing: 15,
                                 mainAxisSpacing: 15,
-                                  mainAxisExtent: 290.0
+                                mainAxisExtent: 290.0,
                               ),
-                              itemCount: products.length,
+                              itemCount: (snapshot.data! as dynamic).docs.length,
                               itemBuilder: (context, index) {
+                                DocumentSnapshot snap = (snapshot.data! as dynamic).docs[index];
                                 return Padding(
                                   padding: EdgeInsets.only(left: 5),
                                   child: Container(
-                                    width: 150,
+                                    width: 140,
                                     height: 200,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
@@ -246,18 +308,16 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                                           children: [
                                             Stack(
                                               children: [
-
                                                 ClipRRect(
-                                                borderRadius: BorderRadius.circular(10),
-                                                child: Image.network(
-                                                  products[index].image,
-                                                  width: double.infinity,
-                                                  height: 200,
-                                                  fit: BoxFit.cover,
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: Image.network(
+                                                    snap["image"],
+                                                    width: double.infinity,
+                                                    height: 200,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
-                                              ),
-
-                                                Positioned(
+                                                FirebaseAuth.instance.currentUser!.uid != widget.uid? Text("") : Positioned(
                                                   top: 10,
                                                   right: 10,
                                                   child: Container(
@@ -277,51 +337,52 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                                                         ),
                                                         // Çöp kutusu ikonu (üstte)
                                                         IconButton(
-                                                            onPressed: () async {
-                                                               await showDialog(context: context, builder: (context) => Dialog(
+                                                          onPressed: () async {
+                                                            await showDialog(
+                                                              context: context,
+                                                              builder: (context) => Dialog(
                                                                 child: ListView(
                                                                   padding: EdgeInsets.symmetric(vertical: 16),
                                                                   shrinkWrap: true,
                                                                   children: [
                                                                     "Ürünü Sil"
-                                                                  ].map((e) => InkWell(
-                                                                    onTap: () async {
-                                                                     await  ProductService().deletePost(products[index].productId);
-                                                                      Navigator.of(context).pop();
+                                                                  ].map(
+                                                                        (e) => InkWell(
+                                                                      onTap: () async {
+                                                                        await ProductService().deletePost(snap["productId"]);
+                                                                        Navigator.of(context).pop();
 
-                                                                     setState(() {
-                                                                       userProducts = firestoreService.getUserProducts();
-                                                                     });
-
-                                                                    },
-                                                                    child: Container(
-                                                                      padding: EdgeInsets.symmetric(
-                                                                        vertical: 12,
-                                                                        horizontal: 16,
+                                                                        setState(() {
+                                                                          userProducts = firestoreService.getUserProducts();
+                                                                        });
+                                                                      },
+                                                                      child: Container(
+                                                                        padding: EdgeInsets.symmetric(
+                                                                          vertical: 12,
+                                                                          horizontal: 16,
+                                                                        ),
+                                                                        child: Text(e),
                                                                       ),
-                                                                      child: Text(e),
                                                                     ),
-                                                                  ),
                                                                   ).toList(),
                                                                 ),
                                                               ),
-                                                              );
-                                                            },
-                                                            icon: Icon(Icons.delete_outline) ,)
+                                                            );
+                                                          },
+                                                          icon: Icon(Icons.delete_outline),
+                                                        )
                                                       ],
                                                     ),
                                                   ),
                                                 ),
-
-
-                                              ]
+                                              ],
                                             ),
                                           ],
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(top: 8, left: 6),
                                           child: Text(
-                                            products[index].title,
+                                            snap["title"],
                                             textAlign: TextAlign.center,
                                             style: TextStyle(fontSize: 15),
                                           ),
@@ -329,7 +390,7 @@ class _ProfileGeneralState extends State<ProfileGeneral> {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 10, bottom: 5, left: 6),
                                           child: Text(
-                                            "${products[index].price} ₺",
+                                            "${snap["price"]} ₺",
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
