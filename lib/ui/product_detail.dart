@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project/models/basket_product.dart';
@@ -14,6 +15,7 @@ import 'package:senior_project/utils/utils.dart';
 import 'package:senior_project/widgets/like_animation.dart';
 
 
+
 class ProductDetailScreen extends StatefulWidget {
 
   final String image;
@@ -26,11 +28,13 @@ class ProductDetailScreen extends StatefulWidget {
   final String size;
   final String uid;
   final likes;
+  final saveProducts;
+  String productQuantity;
 
 
 
   ProductDetailScreen( this.image, this.productTitle, this.productId, this.productPrice, this.description,this.condition,
-      this.category, this.size, this.uid, this.likes,);
+      this.category, this.size, this.uid, this.likes, this.productQuantity, this.saveProducts,);
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -54,11 +58,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     userProvider.fetchUser();
     productProvider = Provider.of<ProductProvider>(context, listen: false);
     isLiked = widget.likes.contains(userProvider.getUser.uid);
+    isSaved = widget.saveProducts.contains(FirebaseAuth.instance.currentUser!.uid);
     getData();
+    isProductCheck();
   }
+
+  isProductCheck()  {
+    if(widget.productQuantity == "0"){
+      widget.productQuantity = "Tükendi";
+    }
+  }
+
 
   bool isLikeAnimating = false;
   late bool isLiked;
+  late bool isSaved;
   bool isLoading = false;
 
 
@@ -84,6 +98,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
 
 
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -91,7 +107,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     var screenSize = MediaQuery.of(context);
     final double height = screenSize.size.height;
     final double width = screenSize.size.width;
-
 
 
     return isLoading ? const Center(child: CircularProgressIndicator(),) : Scaffold(
@@ -176,7 +191,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             iconSize: 20,
                             onPressed: () async {
 
-                              await ProductService().likePost(
+                              await ProductService().likeProduct(
                                 widget.productId,
                                 widget.uid,
                                 widget.likes,
@@ -187,7 +202,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               } else {
                                 widget.likes.add(userProvider.getUser.uid);
                               }
-
                               setState(() {
                                 isLiked = widget.likes.contains(userProvider.getUser.uid);
                               });
@@ -203,19 +217,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
 
-
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10,bottom: 10,left: 15),
-                    child: Text(widget.productTitle,
+              Padding(
+                padding: const EdgeInsets.only(top: 10,bottom: 10,left: 15),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Text(widget.productTitle,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                      fontSize: 18,
                       color: Colors.black,
                     ),
-                    ),
                   ),
+                ),
+              ),
+              Row(
+                children: [
+
                   Spacer(),
                   Padding(
                     padding: const EdgeInsets.only(right: 10),
@@ -227,9 +244,35 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 20,),
-                    child: Icon(Icons.bookmark_border,
-                    size: 30,
-                      color: Colors.pink.shade400,
+                    child:  LikeAnimation(
+                      isAnimating: isSaved,
+                      smallLike: false,
+                      child: IconButton(
+                        icon: isSaved
+                            ? const Icon(Icons.bookmark, color: Colors.red)
+                            : const Icon(Icons.bookmark_border),
+                        color: Colors.pink.shade400,
+                        iconSize: 30,
+                        onPressed: () async {
+
+                          await ProductService().saveProducts(
+                            widget.productId,
+                            widget.uid,
+                            widget.saveProducts,
+                          );
+
+
+                          if (widget.saveProducts.contains(userProvider.getUser.uid)) {
+                            widget.saveProducts.remove(userProvider.getUser.uid);
+                          } else {
+                            widget.saveProducts.add(userProvider.getUser.uid);
+                          }
+                          setState(() {
+                            isSaved = widget.saveProducts.contains(userProvider.getUser.uid);
+                          });
+
+                        },
+                      ),
                     ),
                   ),
 
@@ -286,6 +329,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     color: Colors.grey.shade600,
                     fontSize: 16,
                   ),),
+              ),
+
+              Padding(
+                padding: EdgeInsets.only(left: 18),
+                child: Text("Mevcut Ürün: ${widget.productQuantity} ",
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 16,
+                  ),
+                ),
               ),
 
               Divider(),
@@ -349,9 +402,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: Text("Kuponlar & Kampanyalar",style: TextStyle(
                         color: Colors.black,
                         fontSize: 20,
-
                       ),
-
                       ),
                     ),
                 ),
@@ -391,9 +442,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                         ],
                       ),
-
-
-
                     ],
                   ),
                 ),
@@ -427,7 +475,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 if(index==0){
 
                 }else if(index==1){
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => ShoppingBasketScreen()),
                   );
@@ -441,6 +489,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     category: widget.category,
                     size: widget.size,
                     uid: widget.uid,
+                    productId: widget.productId,
+                    productQuantity: widget.productQuantity,
+                    count: 1,
                   );
 
                   Provider.of<BasketProvider>(context, listen: false).addToBasket(product);

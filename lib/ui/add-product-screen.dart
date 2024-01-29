@@ -38,18 +38,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
   var selectedOption;
   var selectedSize;
 
-  var productTitleController = TextEditingController();
-  var productExpController = TextEditingController();
-  var productPriceController = TextEditingController();
+  TextEditingController productTitleController = TextEditingController();
+  TextEditingController productExpController = TextEditingController();
+  TextEditingController productPriceController = TextEditingController();
+  TextEditingController productQuantityController = TextEditingController();
 
   late UserProvider userProvider;
   @override
   void initState() {
     super.initState();
-    productTitleController = TextEditingController();
-    productExpController = TextEditingController();
-    productPriceController = TextEditingController();
-
   }
 
 
@@ -65,6 +62,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     productTitleController.dispose();
     productExpController.dispose();
     productPriceController.dispose();
+    productQuantityController.dispose();
     super.dispose();
   }
 
@@ -271,7 +269,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   height: 200,
                   child: TextField(
                     controller: productExpController,
-                    maxLength: 50,
                     maxLines: 2,
                     keyboardType: TextInputType.multiline,
                     decoration: InputDecoration(
@@ -286,6 +283,42 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 ),
               ),
             ),
+
+            Padding(
+              padding: const EdgeInsets.only(left: 26,top: 10,bottom: 10),
+              child: Text("Ürün Adedi",
+                style: TextStyle(
+                  fontSize: 17,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ),
+
+            Container(
+              width: width,
+              height: 70,
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20,right: 20),
+                child: SizedBox(
+                  height: 50,
+                  child: TextField(
+                    controller: productQuantityController,
+                    maxLines: 2,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      hintText: "Ürün Adedi",
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
 
             Padding(
               padding: const EdgeInsets.only(top: 20),
@@ -428,6 +461,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         uuid,
                         files,
                         userProvider.getUser.photoUrl,
+                        productQuantityController!.text,
                         userProvider.getUser.name,
                       );
 

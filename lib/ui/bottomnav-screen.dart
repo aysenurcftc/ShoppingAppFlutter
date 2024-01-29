@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:senior_project/ui/add-product-screen.dart';
 import 'package:senior_project/ui/categories/categories_secreen.dart';
 import 'package:senior_project/ui/home-screen.dart';
+import 'package:senior_project/ui/like_product_screen.dart';
 import 'package:senior_project/ui/notification_screen.dart';
 import 'package:senior_project/ui/profile-screen.dart';
 import 'package:senior_project/ui/shopping_basket_screen.dart';
@@ -24,7 +25,8 @@ class _HomeState extends State<Home> {
 
   final List<Widget> pages = [
       HomeScreen(),
-      CategoriesScreen(),
+      //CategoriesScreen(),
+      LikeProductScreen(),
       AddProductScreen(),
       NotificationScreen(),
       ProfileScreen(uid:FirebaseAuth.instance.currentUser!.uid ,),
@@ -56,7 +58,7 @@ class _HomeState extends State<Home> {
           children: [
             SizedBox(
               height: height / 20,
-              width: width / 2 + 65,
+              width: width / 2 + 120,
               child: TextField(
                 controller: searchEditingController,
                 style: TextStyle(fontSize: 13.0),
@@ -91,19 +93,7 @@ class _HomeState extends State<Home> {
                 color: Colors.grey.shade600,
               ),
             ),
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ShoppingBasketScreen()),
-                );
-              },
-              icon: Icon(
-                Icons.shopping_bag_outlined,
-                size: 25.0,
-                color: Colors.grey.shade600,
-              ),
-            ),
+
           ],
         ),
 
@@ -111,7 +101,7 @@ class _HomeState extends State<Home> {
       body: isShowUsers ? FutureBuilder(
         future: FirebaseFirestore.instance.collection("products")
             //.where("title", isEqualTo: searchEditingController.text)
-            .where("title", isEqualTo: searchEditingController.text)
+            .where("", isLessThanOrEqualTo: searchEditingController.text)
             .get(),
         builder: (context, snapshot){
           if(!snapshot.hasData){

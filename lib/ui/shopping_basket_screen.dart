@@ -6,8 +6,10 @@ import 'package:senior_project/providers/basket_provider.dart';
 import 'package:senior_project/providers/purchased_provider.dart';
 import 'package:senior_project/providers/wallet_provider.dart';
 import 'package:senior_project/service/auth.dart';
+import 'package:senior_project/service/product_service.dart';
 
 class ShoppingBasketScreen extends StatefulWidget {
+
 
 
   @override
@@ -24,7 +26,10 @@ class _ShoppingBasketScreenState extends State<ShoppingBasketScreen> {
 
   late String? userId;
 
-  var kuponController = TextEditingController();
+  int count = 1;
+
+
+
 
 
   Future<void> fetchData() async {
@@ -42,50 +47,54 @@ class _ShoppingBasketScreenState extends State<ShoppingBasketScreen> {
   }
 
 
-  Future<void> _onItemTapped(int index) async {
 
+
+  Future<void> _onItemTapped(int index) async {
 
 
     if (index == 1) {
       double basketTotal = toplam;
-
-      // WalletProvider'ı al
       WalletProvider walletProvider =
       Provider.of<WalletProvider>(context, listen: false);
       double currentBalance = double.parse(walletProvider.wallet?.price ?? "0");
-
 
       if (currentBalance >= basketTotal) {
         await walletProvider.updateWalletBalance(
             (currentBalance - basketTotal).toString());
 
 
-        // Satın alınan ürünleri PurchasedItemsProvider'a ekle
         Provider.of<BasketProvider>(context, listen: false)
             .basketItems
-            .forEach((basketItem) {
-          // Sepet ürününden gerekli bilgileri al
+            .forEach((basketItem) async {
+
+          int remainingQuantity =  int.parse(basketItem.productQuantity) - basketItem.count;
+          await ProductService().updateProductQuantity(basketItem.productId, remainingQuantity);
+
           PurchasedItem purchasedItem = PurchasedItem(
             title: basketItem.title,
+            productId : basketItem.productId,
             category: basketItem.category,
-            price: double.parse(basketItem.price),
+            price: double.parse(basketItem.price) * basketItem.count,
             image: basketItem.image,
+            productQuantity: basketItem.productQuantity,
+            count : basketItem.count,
           );
 
           Provider.of<PurchasedItemsProvider>(context, listen: false).addPurchasedItem(purchasedItem, userId!);
-        });
 
+        });
 
         Provider.of<BasketProvider>(context, listen: false).clearBasket();
 
-        // Snackbar veya Toast mesajı göster
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Sepet onaylandı"),
           ),
         );
-      } else {
-        // Cüzdan bakiyesi yetersizse uyarı göster
+      }
+
+      else {
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Yetersiz bakiye!"),
@@ -99,12 +108,20 @@ class _ShoppingBasketScreenState extends State<ShoppingBasketScreen> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Sepetim"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: (){
+           Navigator.pop(context);
+          },
+        ),
       ),
       body: Consumer<BasketProvider>(
         builder: (context, basketProvider, child) {
@@ -119,11 +136,13 @@ class _ShoppingBasketScreenState extends State<ShoppingBasketScreen> {
           }
 
           toplam = basketProvider.basketItems
-              .map((item) => double.parse(item.price))
+              .map((item) => double.parse(item.price) * item.count)
               .reduce((value, element) => value + element);
+
 
           return Column(
             children: [
+              Divider(),
               Expanded(
                 child: ListView.builder(
                   itemCount: basketProvider.basketItems.length,
@@ -159,6 +178,42 @@ class _ShoppingBasketScreenState extends State<ShoppingBasketScreen> {
                             ),
                             Text(item.category),
                             Text("${item.price}₺"),
+                            Row(
+                              children: [
+                                Text("ürün miktarı: ${item.count}"),
+                                IconButton(
+                                    onPressed: (){
+                                      if (item.count < int.parse(item.productQuantity)) {
+                                        setState(() {
+                                          basketProvider.incrementItemCount(index);
+                                        });
+                                      } else {
+
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                           content: Text("Ürün miktarı aşıldı!"),  ));
+                                      }
+
+                                    },
+                                    icon: Icon(Icons.add)
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 15,left: 1),
+                                  child: IconButton(
+                                      onPressed: (){
+                                        setState(() {
+                                          if (item.count > 1) {
+                                            basketProvider.decrementItemCount(index);
+
+                                          }
+                                        });
+
+                                      },
+                                      icon: Icon(Icons.minimize)
+                                  ),
+                                )
+                              ],
+                            ),
                           ],
                         ),
                         trailing: IconButton(
@@ -174,38 +229,8 @@ class _ShoppingBasketScreenState extends State<ShoppingBasketScreen> {
                 ),
               ),
 
-              SizedBox(height: 10), // Add some space between the total and the new TextField
-              Padding(
-                padding: const EdgeInsets.only(left: 10,right: 10,bottom: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            labelText: 'İndirim Kuponu',
-                          ),
-                           controller: kuponController,
-                          // onChanged: (value) {
-                          //   // Handle the entered value
-                          // },
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 10), // Add some space between the TextField and the button
-                    ElevatedButton(
-                      onPressed: () {
-
-                      },
-                      child: Text('Tamam'),
-                    ),
-                  ],
-                ),
-              ),
-
-
+              SizedBox(height: 10),
+              Divider(),
               Padding(
                 padding: EdgeInsets.only(left: 10,right: 10,bottom: 30),
                 child: Row(

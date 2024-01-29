@@ -69,7 +69,7 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
         await FirebaseFirestore.instance.collection("users").doc(user.uid).update({
           'name': nameController.text,
           'surname': surnameController.text,
-          'userName': usernameController.text,
+          'username': usernameController.text,
           // 'email' alanını güncellemiyoruz, çünkü bu alan değiştirilemez (enabled: false)
         });
         //Provider.of<UserProvider>(context, listen: false).updateUser(usernameController.text);

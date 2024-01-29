@@ -8,7 +8,12 @@ class basketProduct {
   late String category;
   late String condition;
   late String uid;
+  late String productId;
   late String image;
+  late String productQuantity;
+
+  late int count;
+
 
 
 
@@ -21,12 +26,13 @@ class basketProduct {
     required this.category,
     required this.condition,
     required this.uid,
+    required this.productId,
     required this.image,
-
+    required this.productQuantity,
+    required this.count,
 
 
   });
-
 
   basketProduct.fromMap(Map<String, dynamic> data) {
     title = data['title'] ?? '';
@@ -36,8 +42,13 @@ class basketProduct {
     condition = data['condition'] ?? '';
     size = data['size'] ?? '';
     uid = data['uid'] ?? '';
+    productId = data['productId'] ?? "";
     image = data['image'] ?? '';
-
+    productQuantity = data["productQuantity"] ?? '';
+    count = data["count"] ?? 0;
 
   }
+
+
+
 }

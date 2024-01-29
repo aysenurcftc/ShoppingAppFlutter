@@ -22,6 +22,23 @@ class BasketProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void incrementItemCount(int index) {
+    if (index >= 0 && index < _basketItems.length) {
+      _basketItems[index].count++;
+      notifyListeners();
+    }
+  }
+
+
+  void decrementItemCount(int index) {
+    if (index >= 0 && index < _basketItems.length) {
+      if (_basketItems[index].count > 1) {
+        _basketItems[index].count--;
+        notifyListeners();
+      }
+    }
+  }
+
 
 
 }

@@ -1,5 +1,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project/models/users.dart';
@@ -28,11 +29,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
     super.dispose();
     _commentController.dispose();
   }
+
+
   @override
   Widget build(BuildContext context) {
 
     final Users user = Provider.of<UserProvider>(context).getUser;
-
 
     return Scaffold(
       appBar: AppBar(
@@ -61,10 +63,14 @@ class _CommentsScreenState extends State<CommentsScreen> {
             );
           }
 
-          return ListView.builder(
+          return  ListView.builder(
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (ctx, index) => CommentCard(
               snap: (snapshot.data! as dynamic).docs[index].data(),
+              onDelete: () async {
+                await ProductService().deleteComment(
+                    snapshot.data!.docs[index].id, widget.snap); // Pass the comment ID or any identifier
+              },
             ),
           );
         },
@@ -90,7 +96,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   child: TextField(
                     controller: _commentController,
                     decoration: InputDecoration(
-                      hintText: "Comment as ${user.name}",
+                      hintText: "Yorum yap",
                       border: InputBorder.none,
                     ),
                   ),
@@ -123,5 +129,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
       ),
     );
 
+
+
   }
+
+
+
+
 }

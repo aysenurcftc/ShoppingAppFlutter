@@ -58,10 +58,10 @@ class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
           label: "Anasayfa",
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.search,
+          icon: Icon(Icons.favorite_border,
             color: Colors.grey.shade600,
             size: 26,),
-          label: 'Kategoriler',
+          label: 'Favorilerim',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.add_circle_outline,
@@ -70,10 +70,10 @@ class _BottomNavigationBarWidgetState extends State<BottomNavigationBarWidget> {
           label: 'Ürün Sat',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.notifications_none_outlined,
+          icon: Icon(Icons.shopping_bag_outlined,
             color: Colors.grey.shade600,
             size: 26,),
-          label: 'Bildirimler',
+          label: 'Sepetim',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person_outline_outlined,

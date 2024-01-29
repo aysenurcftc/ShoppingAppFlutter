@@ -8,6 +8,7 @@ import 'package:senior_project/ui/login/email_verification_screen.dart';
 import 'package:senior_project/ui/login/forgotpass-screen.dart';
 import 'package:senior_project/ui/login/register-screen.dart';
 import 'package:senior_project/utils/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -23,9 +24,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
 
+  bool rememberMe = false;
+
 
 
   var obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    retrieveRememberMeState();
+  }
 
   AuthService authservice = AuthService();
 
@@ -51,25 +60,53 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
 
-  void loginUser() async{
+  void loginUser() async {
     setState(() {
       _isLoading = true;
     });
 
-    String res = await AuthService().loginUser(email: emailController.text, password: passwordController.text);
-    if(res == 'success'){
-      Navigator.of(context as BuildContext).pushReplacement(MaterialPageRoute(builder: (context) => Home()));
-    }else{
+    String res = await AuthService().loginUser(
+      email: emailController.text,
+      password: passwordController.text,
+    );
 
+    if (res == 'success') {
+      // Beni Hatırla seçeneğini sakla
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('rememberMe', rememberMe);
+
+      if (rememberMe) {
+        // Eğer hatırla seçeneği işaretliyse, e-posta ve şifreyi kaydet
+        prefs.setString('email', emailController.text);
+        prefs.setString('password', passwordController.text);
+      } else {
+        // Eğer hatırla seçeneği işaretli değilse önceki bilgileri temizle
+        prefs.remove('email');
+        prefs.remove('password');
+      }
+
+      Navigator.of(context as BuildContext).pushReplacement(
+        MaterialPageRoute(builder: (context) => Home()),
+      );
+    } else {
       showSnackBar(context as BuildContext, res);
-
     }
+
     setState(() {
       _isLoading = false;
     });
-
   }
 
+  void retrieveRememberMeState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      rememberMe = prefs.getBool('rememberMe') ?? false;
+      if (rememberMe) {
+        emailController.text = prefs.getString('email') ?? '';
+        passwordController.text = prefs.getString('password') ?? '';
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -154,7 +191,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Row(
                           children: [
-                            Checkbox(value: true, onChanged: (value) {}),
+                            Checkbox(value: rememberMe, onChanged: (value) {
+                              setState(() {
+                                rememberMe = value ?? false;
+                              });
+                            }),
                             Text("Beni Hatırla"),
                           ],
                         ),
@@ -197,20 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 20,),
 
-                          GestureDetector(
-                            onTap: (){
-                              Navigator.push(context,MaterialPageRoute(builder: (context) => Home()));
-                            },
-                            child: const Text("Üye Olmadan Devam Et",
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.black,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
 
-                          SizedBox(height: 20,),
 
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.center,

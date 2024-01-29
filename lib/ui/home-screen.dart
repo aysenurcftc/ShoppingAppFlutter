@@ -7,11 +7,8 @@ import 'package:senior_project/providers/user_provider.dart';
 import 'package:senior_project/service/auth.dart';
 import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/add-product-screen.dart';
-import 'package:senior_project/ui/create_coupon.dart';
 import 'package:senior_project/ui/new_products_screen.dart';
 import 'package:senior_project/ui/product_detail.dart';
-
-import '../models/users.dart';
 import '../widgets/like_animation.dart';
 
 
@@ -190,43 +187,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
-                            spreadRadius: 3,
-                            blurRadius: 5,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset("img/home-coupon.jpg",
-                              width: 150,
-                            height: 130,
-                              fit: BoxFit.cover,),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text("Kupon Fırsatları",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                              ),),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: 150,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
                             // Gölge rengi ve opaklık
                             spreadRadius: 3,
                             blurRadius: 5,
@@ -240,8 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(10),
                             child: Image.asset("img/home-like.jpg",
                               width: 149,
-                            height: 130,
-                            fit: BoxFit.cover,),
+                              height: 130,
+                              fit: BoxFit.cover,),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
@@ -290,6 +250,44 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: 150,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            spreadRadius: 3,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.asset("img/home-coupon.jpg",
+                              width: 150,
+                            height: 130,
+                              fit: BoxFit.cover,),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text("Kupon Fırsatları",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                              ),),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
 
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -302,10 +300,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
-                            // Gölge rengi ve opaklık
                             spreadRadius: 3,
                             blurRadius: 5,
-                            offset: Offset(0, 3), // Gölge offset değeri (x, y)
+                            offset: Offset(0, 3),
                           ),
                         ],
                       ),
@@ -370,6 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
+            /*
             Padding(
               padding: const EdgeInsets.only(top: 20,bottom: 15),
               child: GestureDetector(
@@ -410,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-            ),
+            ),*/
 
 
             Padding(
@@ -461,13 +459,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       return Row(
                         children: products.map((product) {
                           final int index = products.indexOf(product);
-                          final bool isLiked = liked.contains(index);
                           bool isLikedProduct = product.likes.contains(userProvider.getUser.uid);
                           return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
                               width: 150,
-                              height: 280,
+                              height: 300,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20.0),
@@ -496,6 +493,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         product.size,
                                         product.uid,
                                         product.likes,
+                                        product.productQuantity,
+                                        product.saveProducts,
                                       ),
                                     ),
                                   );
@@ -509,7 +508,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           children: [
                                             GestureDetector(
                                               onDoubleTap: () async {
-                                                await ProductService().likePost(
+                                                await ProductService().likeProduct(
                                                   product.productId,
                                                   product.uid,
                                                   product.likes,
@@ -577,7 +576,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 color: Colors.pink.shade400,
                                                 iconSize: 20,
                                                 onPressed: () async {
-                                                  await ProductService().likePost(
+                                                  await ProductService().likeProduct(
                                                     products[index].productId,
                                                     products[index].uid,
                                                     products[index].likes,
@@ -624,7 +623,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         left: 6,
                                       ),
                                       child: Text(
-                                        product.price ?? '' + "₺",
+                                        product.price + "₺",
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,

@@ -14,8 +14,10 @@ class Product {
   late DateTime timestamp;
   final String profImage;
 
+  final String productQuantity;
   final String name;
   final likes;
+  final saveProducts;
 
 
   // Constructor
@@ -31,8 +33,10 @@ class Product {
     required this.image,
     required this.timestamp,
     required this.profImage,
+    required this.productQuantity,
     required this.name,
     required this.likes,
+    required this.saveProducts,
   });
 
   static Product fromSnap(DocumentSnapshot snap) {
@@ -49,8 +53,10 @@ class Product {
         image : snapshot['image'],
         timestamp: (snapshot['timestamp'] as Timestamp).toDate(),
         profImage: snapshot['profImage'],
+        productQuantity : snapshot['productQuantity'],
         name: snapshot['name'],
         likes: snapshot["likes"],
+      saveProducts:  snapshot["saveProducts"],
 
     );
   }
@@ -68,8 +74,10 @@ class Product {
     'image': image,
     'timestamp' : timestamp,
     'profImage': profImage,
+    'productQuantity' : productQuantity,
     'name' : name,
     'likes' : likes,
+    'saveProducts' : saveProducts,
   };
 
 

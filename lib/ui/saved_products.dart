@@ -1,5 +1,5 @@
 
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senior_project/models/products.dart';
@@ -9,18 +9,19 @@ import 'package:senior_project/service/product_service.dart';
 import 'package:senior_project/ui/product_detail.dart';
 import 'package:senior_project/widgets/like_animation.dart';
 
-class NewProductScreen extends StatefulWidget {
-
+class SaveProductScreen extends StatefulWidget {
+  const SaveProductScreen({super.key});
 
   @override
-  State<NewProductScreen> createState() => _NewProductScreenState();
+  State<SaveProductScreen> createState() => _SaveProductScreenState();
 }
 
-class _NewProductScreenState extends State<NewProductScreen> {
 
 
+class _SaveProductScreenState extends State<SaveProductScreen> {
   late UserProvider userProvider;
   late ProductProvider  productProvider;
+
 
   @override
   void initState() {
@@ -35,19 +36,18 @@ class _NewProductScreenState extends State<NewProductScreen> {
 
   final ProductService firestoreService = ProductService();
 
-
-  bool isLiked = false;
-  bool isLikeAnimating = false;
-
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("En Yeni Ürünler"),
+        title: Text("Koleksiyonum"),
       ),
-      body:   SingleChildScrollView(
+      body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child:  Consumer<ProductProvider>(builder: (context, productProvider, widget){
+        child: Consumer<ProductProvider>(builder: (context, productProvider, widget) {
+          List<String> savedUserIds = [userProvider.getUser.uid]; // Kullanıcının ID'sini içeren liste
+
           return StreamBuilder<List<Product>>(
             stream: firestoreService.streamAllUsersProducts(),
             builder: (context, snapshot) {
@@ -57,7 +57,12 @@ class _NewProductScreenState extends State<NewProductScreen> {
                 return Text('Error: ${snapshot.error}');
               } else {
                 List<Product> products = snapshot.data ?? [];
-                if (products != null && products.isNotEmpty) {
+
+                List<Product> savedProducts = products.where((product) {
+                  return product.saveProducts.any((savedUserId) => savedUserIds.contains(savedUserId));
+                }).toList();
+
+                if (savedProducts.isNotEmpty) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -66,7 +71,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                         child: Row(
                           children: [
                             Text(
-                              'Toplam: ${products.length} ürün',
+                              'Toplam: ${savedProducts.length} ürün',
                               style: TextStyle(
                                 fontSize: 15,
                                 color: Colors.grey.shade600,
@@ -85,31 +90,31 @@ class _NewProductScreenState extends State<NewProductScreen> {
                         shrinkWrap: true,
                         physics: BouncingScrollPhysics(),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 15,
-                            mainAxisSpacing: 15,
-                            mainAxisExtent: 280.0
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 15,
+                          mainAxisSpacing: 15,
+                          mainAxisExtent: 280.0,
                         ),
-                        itemCount: products.length,
+                        itemCount: savedProducts.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ProductDetailScreen(
-                                    products[index].image,
-                                    products[index].title,
-                                    products[index].productId,
-                                    products[index].price,
-                                    products[index].description,
-                                    products[index].category,
-                                    products[index].condition,
-                                    products[index].size,
-                                    products[index].uid,
-                                    products[index].likes,
-                                      products[index].productQuantity,
-                                    products[index].saveProducts,
+                                    savedProducts[index].image,
+                                    savedProducts[index].title,
+                                    savedProducts[index].productId,
+                                    savedProducts[index].price,
+                                    savedProducts[index].description,
+                                    savedProducts[index].category,
+                                    savedProducts[index].condition,
+                                    savedProducts[index].size,
+                                    savedProducts[index].uid,
+                                    savedProducts[index].likes,
+                                    savedProducts[index].productQuantity,
+                                    savedProducts[index].saveProducts,
                                   ),
                                 ),
                               );
@@ -137,7 +142,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
                                         child: Image.network(
-                                          products[index].image,
+                                          savedProducts[index].image,
                                           height: 190,
                                           fit: BoxFit.cover,
                                           width: double.infinity,
@@ -155,33 +160,27 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                           ),
                                           padding: EdgeInsets.all(1),
                                           child: LikeAnimation(
-                                            isAnimating: products[index].likes.contains(userProvider.getUser.uid),
+                                            isAnimating: savedProducts[index].likes.contains(userProvider.getUser.uid),
                                             smallLike: false,
                                             child: IconButton(
-                                                icon: products[index].likes
-                                                    .contains(userProvider.getUser.uid)
-                                                    ? const Icon(Icons.favorite, color: Colors.red)
-                                                    : const Icon(Icons.favorite_border),
-                                                color: Colors.pink.shade400,
-                                                iconSize: 20,
-                                                onPressed: () async {
-                                                  await ProductService().likeProduct(
-                                                    products[index].productId,
-                                                    userProvider.getUser.uid,
-                                                    products[index].likes,
-                                                  );
+                                              icon: savedProducts[index].likes.contains(userProvider.getUser.uid)
+                                                  ? const Icon(Icons.favorite, color: Colors.red)
+                                                  : const Icon(Icons.favorite_border),
+                                              color: Colors.pink.shade400,
+                                              iconSize: 20,
+                                              onPressed: () async {
+                                                await ProductService().likeProduct(
+                                                  savedProducts[index].productId,
+                                                  userProvider.getUser.uid,
+                                                  savedProducts[index].likes,
+                                                );
 
-                                                  // Beğeni durumunu güncelle
-                                                  if (productProvider.likedProductIds
-                                                      .contains(products[index].productId)) {
-                                                    productProvider.removeFromLikedProducts(
-                                                        products[index].productId);
-                                                  } else {
-                                                    productProvider.addToLikedProducts(
-                                                        products[index].productId);
-                                                  }
-
+                                                if (productProvider.likedProductIds.contains(savedProducts[index].productId)) {
+                                                  productProvider.removeFromLikedProducts(savedProducts[index].productId);
+                                                } else {
+                                                  productProvider.addToLikedProducts(savedProducts[index].productId);
                                                 }
+                                              },
                                             ),
                                           ),
                                         ),
@@ -191,7 +190,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8, left: 6),
                                     child: Text(
-                                      products[index].title,
+                                      savedProducts[index].title,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(fontSize: 15),
                                     ),
@@ -199,7 +198,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 10, bottom: 5, left: 6),
                                     child: Text(
-                                      "${products[index].price} ₺",
+                                      "${savedProducts[index].price} ₺",
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -216,13 +215,21 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     ],
                   );
                 } else {
-                  return Text('Henüz ürün eklenmemiş.');
+                  return SizedBox(
+                    height: 400,
+                    child: Center(
+                        child: Text('Henüz koleksiyon bulunmamaktadır.',
+                          style: TextStyle(
+                            color:Colors.pinkAccent,
+                            fontSize: 16,
+                          ),
+                        )),
+                  );
                 }
               }
             },
           );
-        },
-        ),
+        }),
       ),
     );
   }

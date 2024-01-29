@@ -94,6 +94,7 @@ class ProductService {
       String uid,
       Uint8List? image,
       String profImage,
+      String productQuantity,
       String name,
       ) async {
     try {
@@ -120,8 +121,11 @@ class ProductService {
             image: imageUrl,
             timestamp: DateTime.now(),
             profImage: profImage,
+            productQuantity : productQuantity,
             name: name,
-            likes: []);
+            likes: [],
+            saveProducts : [],
+        );
 
         await userProductsCollection.doc(productId).set(product.toJson());
         print('Ürün başarıyla eklendi. Product ID:');
@@ -231,8 +235,7 @@ class ProductService {
 
 
 
-
-  Future<String> likePost(String productId, String uid, List likes) async {
+  Future<String> likeProduct(String productId, String uid, List likes) async {
     String res = "Some error occurred";
 
     try {
@@ -252,6 +255,50 @@ class ProductService {
     }
     return res;
   }
+
+
+  Future<String> saveProducts(String productId, String uid, List saveProducts) async {
+    String res = "Some error occurred";
+
+    try {
+      if (saveProducts.contains(uid)) {
+        _firestore.collection('products').doc(productId).update({
+          'saveProducts': FieldValue.arrayRemove([uid])
+        });
+      } else {
+        // else we need to add uid to the likes array
+        _firestore.collection('products').doc(productId).update({
+          'saveProducts': FieldValue.arrayUnion([uid])
+        });
+      }
+      res = 'success';
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
+  /*
+  Future<String> likePost(String productId, String uid, List likes) async {
+    String res = "Some error occurred";
+
+    try {
+      if (likes.contains(uid)) {
+        _firestore.collection('products').doc(productId).update({
+          'likes': FieldValue.arrayRemove([uid])
+        });
+      } else {
+        // else we need to add uid to the likes array
+        _firestore.collection('products').doc(productId).update({
+          'likes': FieldValue.arrayUnion([uid])
+        });
+      }
+      res = 'success';
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }*/
 
 
   Future<String> postComment(String productId, String text, String uid, String name, String profilePic) async {
@@ -296,6 +343,15 @@ class ProductService {
     return res;
   }
 
+  Future<void> deleteComment(String commentId, String productId) async {
+    await FirebaseFirestore.instance
+        .collection('products')
+        .doc(productId)
+        .collection('comments')
+        .doc(commentId)
+        .delete();
+  }
+
 
   Future<void> followUser(String uid, String followId) async {
     try {
@@ -326,7 +382,11 @@ class ProductService {
   }
 
 
-
+  Future<void> updateProductQuantity(String productId, int newQuantity) async {
+    await _firestore.collection('products').doc(productId).update({
+      'productQuantity': newQuantity.toString(),
+    });
+  }
 
 
 

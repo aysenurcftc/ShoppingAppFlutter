@@ -6,6 +6,7 @@ import 'package:senior_project/ui/myWallet.dart';
 import 'package:senior_project/ui/my_coupon.dart';
 import 'package:senior_project/ui/my_orders.dart';
 import 'package:senior_project/ui/profil-general.dart';
+import 'package:senior_project/ui/saved_products.dart';
 import 'package:senior_project/ui/user_settings.dart';
 
 
@@ -19,12 +20,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  TextEditingController _searchController = TextEditingController();
 
-
-  void _startSearch() {
-    String query = _searchController.text;
-  }
 
   AuthService authService = AuthService();
   late Future<String?> username;
@@ -84,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Consumer<UserProvider>(
                           builder: (BuildContext context, UserProvider value, Widget? child) {
                             return Text(
-                              value.getUser?.name ?? "Kullanıcı",
+                              value.getUser?.username ?? "Kullanıcı",
                               style: TextStyle(
                                 color: Colors.grey.shade600,
                                 fontWeight: FontWeight.bold,
@@ -231,7 +227,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
-              
+
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) =>  SaveProductScreen()),
+                        );
+                      },
+                      child: Container(
+                        color: Colors.white,
+                        width: width,
+                        child: ListTile(
+                          leading: Icon(Icons.collections_bookmark_outlined),
+                          title: Row(
+                            children: [
+                              Text("Koleksiyonum",
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                ),),
+                              Spacer(),
+                              Icon(Icons.arrow_forward_ios,
+                                color: Colors.grey.shade600,),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
                     GestureDetector(
                       onTap: (){
                         Navigator.push(
@@ -239,11 +262,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           MaterialPageRoute(builder: (context) => myWalletScreen()),
                         );
                       },
+
                       child: Container(
                         color: Colors.white,
                         width: width,
                         child: ListTile(
-                          leading: Icon(Icons.wallet),
+                          leading: Icon(Icons.wallet_outlined),
                           title: Row(
                             children: [
                               Text("Cüzdanım",

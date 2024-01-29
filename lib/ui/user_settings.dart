@@ -13,6 +13,12 @@ class UserSettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Kullanıcı Ayarları"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: (){
+            Navigator.pop(context);
+          },
+        ),
       ),
 
       body: SingleChildScrollView(
@@ -33,7 +39,7 @@ class UserSettingsScreen extends StatelessWidget {
       padding: const EdgeInsets.only(top: 5),
       child: GestureDetector(
         onTap: () {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => destinationScreen),
           );

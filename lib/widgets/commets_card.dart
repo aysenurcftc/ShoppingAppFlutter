@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 class CommentCard extends StatefulWidget {
 
   final snap;
-  const CommentCard({super.key, required this.snap});
+  final VoidCallback onDelete;
+
+  const CommentCard({super.key, required this.snap, required this.onDelete});
 
   @override
   State<CommentCard> createState() => _CommentCardState();
@@ -78,14 +80,26 @@ class _CommentCardState extends State<CommentCard> {
             ),
           ),
 
-
-          Container(
-            padding: EdgeInsets.all(9),
-            child: Icon(Icons.favorite_border,size: 16,),
+          Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(9),
+                child: Icon(Icons.favorite_border,size: 16,),
+              ),
+            ],
           ),
-
+          InkWell(
+            onTap: () {
+                widget.onDelete();
+            },
+            child: Container(
+              padding: EdgeInsets.all(9),
+              child: Icon(Icons.delete, size: 16),
+            ),
+          ),
         ],
       ),
     );
   }
 }
+
